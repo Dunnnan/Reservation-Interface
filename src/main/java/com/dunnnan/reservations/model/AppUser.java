@@ -50,6 +50,14 @@ public class AppUser {
         this.userType = userType;
     }
 
+    public AppUser(String name, String surname, String email, String phoneNumber, String password) {
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+    }
+
     public Long getId() {
         return id;
     }

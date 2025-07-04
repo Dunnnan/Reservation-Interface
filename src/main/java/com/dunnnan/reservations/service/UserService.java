@@ -9,12 +9,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.dunnnan.reservations.model.dto.AppUserDto;
+
 @Service
 public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
+    //Login
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         AppUser user = userRepository.findByEmail(email)
@@ -25,6 +28,22 @@ public class UserService implements UserDetailsService {
                 .password(user.getPassword())
                 .roles(user.getUserType().toString())
                 .build();
+    }
+
+    //Registration
+    public boolean emailExists(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    public void registerUser(AppUserDto appUserDto) {
+        AppUser newUser = new AppUser(
+                appUserDto.getName(),
+                appUserDto.getSurname(),
+                appUserDto.getEmail(),
+                appUserDto.getPhoneNumber(),
+                appUserDto.getPassword()
+        );
+        userRepository.save(newUser);
     }
 
 }
