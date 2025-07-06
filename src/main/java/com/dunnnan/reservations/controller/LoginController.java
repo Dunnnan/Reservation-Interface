@@ -23,11 +23,6 @@ public class LoginController {
         return "login";
     }
 
-    @GetMapping("/home")
-    public String home() {
-        return "home";
-    }
-
     @GetMapping("/register")
     public String register(Model model) {
         model.addAttribute("user", new AppUserDto());

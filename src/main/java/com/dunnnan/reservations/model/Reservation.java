@@ -16,7 +16,7 @@ public class Reservation {
     private AppUser appUser;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "resouce_id", nullable = false)
+    @JoinColumn(name = "resource_id", nullable = false)
     private Resource resource;
 
     @Column(nullable = false, updatable = false, name="start_time")

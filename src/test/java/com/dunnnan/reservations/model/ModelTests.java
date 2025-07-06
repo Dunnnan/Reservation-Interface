@@ -1,9 +1,6 @@
 package com.dunnnan.reservations.model;
 
-import org.h2.engine.User;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.math.BigDecimal;
 
@@ -18,7 +15,7 @@ public class ModelTests {
     }
 
     @Test
-    void userReservatorShouldBeCreated() {
+    void userShouldBeCreatedFullConstructor() {
         AppUser user = new AppUser(
                 "Mateo",
                 "Maldini",
@@ -27,6 +24,19 @@ public class ModelTests {
                 "111222333",
                 BigDecimal.ZERO,
                 UserType.RESERVATOR);
+
+        assertThat(user.getBalance()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(user.getUserType()).isEqualTo(UserType.RESERVATOR);
+    }
+
+    @Test
+    void userShouldBeCreatedMediumConstructor() {
+        AppUser user = new AppUser(
+                "Mateo",
+                "Maldini",
+                "yes@mail.com",
+                "password",
+                "111222333");
 
         assertThat(user.getBalance()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(user.getUserType()).isEqualTo(UserType.RESERVATOR);

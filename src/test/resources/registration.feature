@@ -24,5 +24,5 @@ Feature: Registration
 
   Scenario: User wants to login to account
     Given user is on register page
-    When clicks Login button
+    When user clicks Login button
     Then he should be transferred to the login page

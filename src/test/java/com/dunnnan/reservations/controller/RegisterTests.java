@@ -1,14 +1,14 @@
-package com.dunnnan.reservations.controller.register;
+package com.dunnnan.reservations.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -32,12 +32,12 @@ public class RegisterTests {
     @Test
     public void shouldNotRegisterDueToIncorrectEmail() throws Exception {
         mockMvc.perform(post("/register")
-                .param("name", "name")
-                .param("surname","surname")
-                .param("email", "wrong_email")
-                .param("phoneNumber", "123123123")
-                .param("password", "password")
-                .param("confirmPassword", "password"))
+                        .param("name", "name")
+                        .param("surname", "surname")
+                        .param("email", "wrong_email")
+                        .param("phoneNumber", "123123123")
+                        .param("password", "password")
+                        .param("confirmPassword", "password"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("register"))
                 .andExpect(model().attributeHasFieldErrors("user", "email"));
@@ -46,12 +46,12 @@ public class RegisterTests {
     @Test
     public void shouldNotRegisterDueToIncorrectPassword() throws Exception {
         mockMvc.perform(post("/register")
-                .param("name", "name")
-                .param("surname","surname")
-                .param("email", "mail@com.pl")
-                .param("phoneNumber", "123123123")
-                .param("password", "password")
-                .param("confirmPassword", "different_password"))
+                        .param("name", "name")
+                        .param("surname", "surname")
+                        .param("email", "mail@com.pl")
+                        .param("phoneNumber", "123123123")
+                        .param("password", "password")
+                        .param("confirmPassword", "different_password"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("register"))
                 .andExpect(model().attributeHasFieldErrors("user", "confirmPassword"));
@@ -61,7 +61,7 @@ public class RegisterTests {
     public void shouldRegisterDueToCorrectCredentials() throws Exception {
         mockMvc.perform(post("/register")
                         .param("name", "name")
-                        .param("surname","surname")
+                        .param("surname", "surname")
                         .param("email", "new_mail@com.pl")
                         .param("phoneNumber", "123123123")
                         .param("password", "password")
