@@ -1,13 +1,15 @@
+@e2e
 Feature: Login
 
-  Scenario: User logs correctly
+  Background:
     Given user is on logging page
+
+  Scenario: User logs correctly
     When user enters correct email and password
     And clicks Login button
     Then he should login and redirect to home page
 
   Scenario: User logs incorrectly
-    Given user is on logging page
     When puts in incorrect email or password
     And clicks Login button
     Then he should see the logging failure message
