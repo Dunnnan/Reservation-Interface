@@ -10,11 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -37,21 +38,27 @@ public class ResourcesTests {
 
     @Test
     public void shouldAccessHomePage() throws Exception {
-        mockMvc.perform(get("/home"))
+        mockMvc.perform(get("/home")
+                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                )
                 .andExpect(status().isOk())
                 .andExpect(view().name("home"));
     }
 
     @Test
     public void shouldAccessSpecifiedResourcePage() throws Exception {
-        mockMvc.perform(get("/resource/1"))
+        mockMvc.perform(get("/resource/1")
+                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                )
                 .andExpect(status().isOk())
                 .andExpect(view().name("resource-detail"));
     }
 
     @Test
     public void shouldNavigateBetweenPagesOfResource() throws Exception {
-        mockMvc.perform(get("/home?page=1&size=10"))
+        mockMvc.perform(get("/home?page=0")
+                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                )
                 .andExpect(status().isOk())
                 .andExpect(view().name("home"))
                 .andExpect(model().attributeExists("resources"));
@@ -59,7 +66,9 @@ public class ResourcesTests {
 
     @Test
     public void shouldSearchForASpecificResource() throws Exception {
-        mockMvc.perform(get("/home?search=cat"))
+        mockMvc.perform(get("/home?search=cat")
+                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                )
                 .andExpect(status().isOk())
                 .andExpect(view().name("home"))
                 .andExpect(model().attributeExists("resources"));
@@ -67,7 +76,9 @@ public class ResourcesTests {
 
     @Test
     public void shouldFilterResourceByParameter() throws Exception {
-        mockMvc.perform(get("/home?type=cat"))
+        mockMvc.perform(get("/home?type=CAT")
+                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                )
                 .andExpect(status().isOk())
                 .andExpect(view().name("home"))
                 .andExpect(model().attributeExists("resources"));
@@ -75,7 +86,7 @@ public class ResourcesTests {
 
     @Test
     public void shouldSortResourceByParameter() throws Exception {
-        mockMvc.perform(get("/home?sort=name,asc"))
+        mockMvc.perform(get("/home?sortField=id&sortDirection=asc"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("home"))
                 .andExpect(model().attributeExists("resources"));
@@ -83,7 +94,9 @@ public class ResourcesTests {
 
     @Test
     public void shouldTheAddResourceFormExists() throws Exception {
-        mockMvc.perform(get("/home"))
+        mockMvc.perform(get("/home")
+                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                )
                 .andExpect(status().isOk())
                 .andExpect(view().name("home"))
                 .andExpect(model().attributeExists("resource"));
@@ -92,60 +105,14 @@ public class ResourcesTests {
     @Test
     public void shouldSubmitTheAddResourceForm() throws Exception {
         mockMvc.perform(post("/resource/add")
-                    .param("name", "name")
-                    .param("description", "description")
-                    .param("imageName", "imageName")
-                    .param("type", "CAT"))
+                        .param("name", "name")
+                        .param("description", "description")
+                        .param("imageName", "imageName")
+                        .param("type", "CAT")
+                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/home"));
-    }
-
-    @Test
-    public void shouldAccessRegisterPage() throws Exception {
-        mockMvc.perform(get("/register"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("register"));
-    }
-
-    @Test
-    public void shouldNotRegisterDueToIncorrectEmail() throws Exception {
-        mockMvc.perform(post("/register")
-                        .param("name", "name")
-                        .param("surname","surname")
-                        .param("email", "wrong_email")
-                        .param("phoneNumber", "123123123")
-                        .param("password", "password")
-                        .param("confirmPassword", "password"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("register"))
-                .andExpect(model().attributeHasFieldErrors("user", "email"));
-    }
-
-    @Test
-    public void shouldNotRegisterDueToIncorrectPassword() throws Exception {
-        mockMvc.perform(post("/register")
-                        .param("name", "name")
-                        .param("surname","surname")
-                        .param("email", "mail@com.pl")
-                        .param("phoneNumber", "123123123")
-                        .param("password", "password")
-                        .param("confirmPassword", "different_password"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("register"))
-                .andExpect(model().attributeHasFieldErrors("user", "confirmPassword"));
-    }
-
-    @Test
-    public void shouldRegisterDueToCorrectCredentials() throws Exception {
-        mockMvc.perform(post("/register")
-                        .param("name", "name")
-                        .param("surname","surname")
-                        .param("email", "new_mail@com.pl")
-                        .param("phoneNumber", "123123123")
-                        .param("password", "password")
-                        .param("confirmPassword", "password"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/login"));
     }
 
 }

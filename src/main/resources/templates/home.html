@@ -4,15 +4,11 @@
     <title>Home</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
     <style>
-        .card-img-top {
-            height: 180px;
-            object-fit: cover;
-        }
         .type-badge {
-            padding: 0.3rem 0.6rem;
-            border-radius: 0.5rem;
-            color: #fff;
-            font-weight: bold;
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 5px;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -44,7 +40,7 @@
 
 <div class="row mt-4 shadow-sm border-primary-subtle">
     <form class="d-flex" role="search">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search..." aria-label="Search">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search..." aria-label="Search" th:value="${search}" >
         <button class="btn btn-outline-primary my-1 my-sm-0" type="submit">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search"
                  viewBox="0 0 16 16">
@@ -55,6 +51,25 @@
 </div>
 
 <div class="container-fluid">
+
+    <table class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>
+                <a th:href="@{/home(sortField='id', sortDirection=${reverseSortDirection})}">ID</a>
+            </th>
+            <th>
+                <a th:href="@{/home(sortField='name', sortDirection=${reverseSortDirection})}">Name</a>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="resource : ${resources}">
+            <td th:text="${resource.id}"></td>
+            <td th:text="${resource.name}"></td>
+        </tr>
+        </tbody>
+    </table>
 
     <div class="row mt-4">
         <div class="col-md-9">
@@ -87,20 +102,83 @@
 </div>
 
 
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 justify-content-around">
     <div class="col" th:each="resource : ${resources}">
-        <div class="card border-primary-subtle shadow-sm h-100">
-            <img th:src="@{'/images/' + ${resource.imageName}}" class="card-img-top" alt="Image">
-            <div class="card-body">
-                <h5 class="card-title" th:text="${resource.name}">Resource Title</h5>
-                <span class="type-badge"
-                      th:text="${resource.type}"
-                      th:style="'background-color: ' + ${#maps.get({'BOOK':'#0d6efd', 'EQUIPMENT':'#198754'}, resource.type.name())}">
+        <a th:href="@{'/resource/' + ${resource.id}}" class="text-decoration-none text-reset">
+            <div class="card text-center border-primary-subtle shadow-sm h-100 " style="width: 18rem;">
+                <img th:src="@{'/images/' + ${resource.imageName}   }" class="card-img-top" alt="Image">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${resource.name}">Resource Title</h5>
+                    <span class="type-badge"
+                          th:text="${resource.type}"
+                          th:style="bg-primary-subtle">
                     </span>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
 </div>
+
+<div th:if="${resources == null}">
+    <h1>No resources available.</h1>
+</div>
+<div th:if="${resources != null}">
+    <h1>Resources available.</h1>
+</div>
+<div th:if="${not resources.hasContent()}">
+    <h1>Resources are available but list is empty.</h1>
+</div>
+
+<p class="text-center" th:text="'Total resources: ' + ${totalElements}"></p>
+
+<nav class="d-flex justify-content-center">
+    <ul class="pagination">
+
+        <!-- Previous -->
+        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+            <!-- With sort -->
+            <a class="page-link"
+               th:if="${sortField != null and sortDirection != null}"
+               th:href="@{/home(page=${currentPage - 1}, sortField=${sortField}, sortDirection=${sortDirection})}">Previous</a>
+
+            <!-- Without sort -->
+            <a class="page-link"
+               th:unless="${sortField != null and sortDirection != null}"
+               th:href="@{/home(page=${currentPage - 1})}">Previous</a>
+        </li>
+
+        <!-- Page Numbers -->
+        <li class="page-item"
+            th:each="i : ${#numbers.sequence(startPage, endPage)}"
+            th:classappend="${i == currentPage} ? 'active'">
+
+            <!-- With sort -->
+            <a class="page-link"
+               th:if="${sortField != null and sortDirection != null}"
+               th:href="@{/home(page=${i}, sortField=${sortField}, sortDirection=${sortDirection})}"
+               th:text="${i + 1}"></a>
+
+            <!-- Without sort -->
+            <a class="page-link"
+               th:unless="${sortField != null and sortDirection != null}"
+               th:href="@{/home(page=${i})}"
+               th:text="${i + 1}"></a>
+        </li>
+
+        <!-- Next -->
+        <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+            <!-- With sort -->
+            <a class="page-link"
+               th:if="${sortField != null and sortDirection != null}"
+               th:href="@{/home(page=${currentPage + 1}, sortField=${sortField}, sortDirection=${sortDirection})}">Next</a>
+
+            <!-- Without sort -->
+            <a class="page-link"
+               th:unless="${sortField != null and sortDirection != null}"
+               th:href="@{/home(page=${currentPage + 1})}">Next</a>
+        </li>
+    </ul>
+</nav>
 
 </div>
 
