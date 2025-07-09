@@ -86,7 +86,9 @@ public class ResourcesTests {
 
     @Test
     public void shouldSortResourceByParameter() throws Exception {
-        mockMvc.perform(get("/home?sortField=id&sortDirection=asc"))
+        mockMvc.perform(get("/home?sortField=id&sortDirection=asc")
+                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                )
                 .andExpect(status().isOk())
                 .andExpect(view().name("home"))
                 .andExpect(model().attributeExists("resources"));
