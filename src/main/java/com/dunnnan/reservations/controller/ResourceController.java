@@ -1,6 +1,8 @@
 package com.dunnnan.reservations.controller;
 
 import com.dunnnan.reservations.model.Resource;
+import com.dunnnan.reservations.model.ResourceType;
+import com.dunnnan.reservations.model.dto.ResourceDto;
 import com.dunnnan.reservations.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,10 +11,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +34,9 @@ public class ResourceController {
             @RequestParam(name = "page") Optional<Integer> page,
             @RequestParam(name = "size") Optional<Integer> size,
             @RequestParam(name = "type") Optional<List<String>> types,
-            @RequestParam(name = "search") Optional<String> search
+            @RequestParam(name = "search") Optional<String> search,
+            @RequestParam(name = "typeOptions") Optional<List<String>> typeOptions,
+            @ModelAttribute("resource") ResourceDto resource
     ) {
 
         // Handle Page parameters
@@ -87,18 +93,46 @@ public class ResourceController {
         // Search
         model.addAttribute("search", search);
 
+        // Types
+        model.addAttribute("typeOptions", Arrays.asList(ResourceType.values()));
+
+        // New Resource dto
+        model.addAttribute("resource", new ResourceDto());
+
         // Data
         model.addAttribute("resources", resourcePage);
         return "home";
     }
 
-//    @PostMapping("/home")
-//    public String addResource() {
-//
-//    }
-//
-//
-//    @PostMapping("/home/add")
+    @PostMapping("/resource")
+    public String addResource(
+            @ModelAttribute("resource") @Validated ResourceDto resource,
+            BindingResult result,
+            Model model
+    ) throws IOException {
+
+        // Validate sent image (if it's image)
+        if (!resourceService.isImage(resource.getImage())) {
+            result.rejectValue("image", "error.image", "File is not an image");
+        }
+
+        // Validate sent type (if it's listed in ResourceType enum)
+        if (Arrays.stream(ResourceType.values())
+                .noneMatch(type -> type.name().equalsIgnoreCase(resource.getType()))
+        ) {
+            result.rejectValue("type", "error.type", "Type doesn't exist in system");
+        }
+
+        if (result.hasErrors()) {
+            return "redirect:/home";
+        }
+
+        // Save new resource
+        resourceService.addResource(resource);
+        System.out.println("Resource added");
+
+        return "redirect:/home";
+    }
 
     @GetMapping("/resource/{id}")
     public String resource(

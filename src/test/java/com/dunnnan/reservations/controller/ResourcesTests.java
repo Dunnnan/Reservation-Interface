@@ -10,12 +10,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -95,26 +98,64 @@ public class ResourcesTests {
     }
 
     @Test
-    public void shouldTheAddResourceFormExists() throws Exception {
+    public void shouldAddResourceFormExistsIfUserIsAnEmployee() throws Exception {
         mockMvc.perform(get("/home")
-                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                        .with(user("ad@com.pl").roles("EMPLOYEE"))
                 )
                 .andExpect(status().isOk())
                 .andExpect(view().name("home"))
-                .andExpect(model().attributeExists("resource"));
+                .andExpect(model().attributeExists("resource"))
+                .andExpect(content().string(containsString("id=\"addResourceModal\"")));
+    }
+
+    @Test
+    public void shouldAddResourceFormNotExistsIfUserIsAnReservant() throws Exception {
+        mockMvc.perform(get("/home")
+                        .with(user("mail@com.pl").roles("Reservant"))
+                )
+                .andExpect(status().isOk())
+                .andExpect(view().name("home"))
+                .andExpect(model().attributeExists("resource"))
+                .andExpect(content().string(not(containsString("id=\"addResourceModal\""))));
     }
 
     @Test
     public void shouldSubmitTheAddResourceForm() throws Exception {
-        mockMvc.perform(post("/resource/add")
+        MockMultipartFile imageFile = new MockMultipartFile(
+                "image",
+                "test-image.jpg",
+                "image/jpeg",
+                "image-content".getBytes()
+        );
+
+        mockMvc.perform(multipart("/resource")
+                        .file(imageFile)
                         .param("name", "name")
                         .param("description", "description")
-                        .param("imageName", "imageName")
                         .param("type", "CAT")
-                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                        .with(user("ad@com.pl").roles("EMPLOYEE"))
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/home"));
+    }
+
+    @Test
+    public void shouldGetNotAuthorizedCode() throws Exception {
+        MockMultipartFile imageFile = new MockMultipartFile(
+                "image",
+                "test-image.jpg",
+                "image/jpeg",
+                "image-content".getBytes()
+        );
+
+        mockMvc.perform(multipart("/resource")
+                        .file(imageFile)
+                        .param("name", "name")
+                        .param("description", "description")
+                        .param("type", "CAT")
+                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                )
+                .andExpect(status().is4xxClientError());
     }
 
 }

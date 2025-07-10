@@ -8,6 +8,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class ModelTests {
 
+    // Login
     @Test
     void emptyUserShouldBeCreated() {
         AppUser user = new AppUser();
@@ -47,5 +48,6 @@ public class ModelTests {
         assertThat(UserType.RESERVATOR.toString()).isEqualTo("RESERVATOR");
         assertThat(UserType.EMPLOYEE.toString()).isEqualTo("EMPLOYEE");
     }
+
 
 }

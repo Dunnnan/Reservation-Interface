@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/login", "/register").permitAll()
+                        .requestMatchers("/resource").hasRole("EMPLOYEE")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

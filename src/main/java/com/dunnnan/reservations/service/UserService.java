@@ -1,15 +1,13 @@
 package com.dunnnan.reservations.service;
 
 import com.dunnnan.reservations.model.AppUser;
+import com.dunnnan.reservations.model.dto.AppUserDto;
 import com.dunnnan.reservations.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import com.dunnnan.reservations.model.dto.AppUserDto;
 
 @Service
 public class UserService implements UserDetailsService {

@@ -3,6 +3,10 @@ INSERT INTO app_user(name, surname, email, password, phone_number, balance, user
 VALUES('Mateo', 'Maldini', 'mail@com.pl', 'password', '111222333', 0, 'RESERVATOR');
 
 
+INSERT INTO app_user(name, surname, email, password, phone_number, balance, user_type)
+VALUES('Admin', 'Admin', 'ad@com.pl', 'password', '111222333', 0, 'EMPLOYEE');
+
+
 --Resources
 INSERT INTO resource(name, description, image_name, type)
 VALUES('Larry', 'The scariest of all cats', 'Larry.png', 'Cat');
