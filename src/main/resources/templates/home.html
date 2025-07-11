@@ -45,95 +45,122 @@
 </nav>
 
 <!--Search row-->
-<div class="row mt-4 shadow-sm border-primary-subtle">
-    <form class="d-flex" role="search">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search..." aria-label="Search"
-               th:value="${search}">
-        <button class="btn btn-outline-primary my-1 my-sm-0" type="submit">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search"
-                 viewBox="0 0 16 16">
-                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-            </svg>
-        </button>
-    </form>
+<div class="container mt-4 p-3">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form role="search">
+                <!--Other-->
+                <input type="hidden" name="sortField" th:value="${sortField}"/>
+                <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
+                <div th:each="type : ${types}">
+                    <input type="hidden" name="types" th:value="${type}"/>
+                </div>
+
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-search"
+                             viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                        </svg>
+                    </span>
+
+                    <input type="search"
+                           class="form-control"
+                           placeholder="Search..."
+                           aria-label="Search"
+                           name="search"
+                           th:value="${search}">
+
+                    <button type="submit"
+                            class="btn btn-outline-primary">
+                        Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <!--Add resource-->
 <div sec:authorize="hasRole('EMPLOYEE')">
 
-    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addResourceModal">
-        Add Resource
-    </button>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 justify-content-center">
+        <button type="button" class="btn btn-outline-primary md-4 p-3" data-bs-toggle="modal"
+                data-bs-target="#addResourceModal">
+            Add Resource
+        </button>
 
-    <div class="modal fade" id="addResourceModal" tabindex="-1" aria-labelledby="addResourceModal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form th:action="@{/resource}" th:object="${resource}" method="post" enctype="multipart/form-data">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addResourceModalLabel">
-                            Add Resource
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <!--Name-->
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" th:field="*{name}" class="form-control" id="name" required/>
-                            <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+        <div class="modal fade" id="addResourceModal" tabindex="-1" aria-labelledby="addResourceModal"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/resource}" th:object="${resource}" method="post" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addResourceModalLabel">
+                                Add Resource
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
-                        <!--Description-->
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <input type="text" th:field="*{description}" class="form-control" id="description"
-                                   required/>
-                            <div class="text-danger" th:if="${#fields.hasErrors('description')}"
-                                 th:errors="*{description}"></div>
+                        <div class="modal-body">
+                            <!--Name-->
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" th:field="*{name}" class="form-control" id="name" required/>
+                                <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                            </div>
+
+                            <!--Description-->
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <input type="text" th:field="*{description}" class="form-control" id="description"
+                                       required/>
+                                <div class="text-danger" th:if="${#fields.hasErrors('description')}"
+                                     th:errors="*{description}"></div>
+                            </div>
+
+                            <!--Image-->
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Image</label>
+                                <input type="file" th:field="*{image}" class="form-control" id="image" alt="Image"
+                                       required/>
+                                <div class="text-danger" th:if="${#fields.hasErrors('image')}"
+                                     th:errors="*{image}"></div>
+                            </div>
+
+                            <!--Type-->
+                            <div class="mb-3">
+                                <label for="type" class="form-label">Type</label>
+                                <select th:field="*{type}" class="form-select" id="type" required>
+                                    <option th:each="option: ${typeOptions}"
+                                            th:value="${option}"
+                                            th:text="${option}">
+                                    </option>
+                                </select>
+                                <div class="text-danger" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
+                            </div>
+
                         </div>
 
-                        <!--Image-->
-                        <div class="mb-3">
-                            <label for="image" class="form-label">Image</label>
-                            <input type="file" th:field="*{image}" class="form-control" id="image" alt="Image"
-                                   required/>
-                            <div class="text-danger" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                Save
+                            </button>
                         </div>
 
-                        <!--Type-->
-                        <div class="mb-3">
-                            <label for="type" class="form-label">Type</label>
-                            <select th:field="*{type}" class="form-select" id="type" required>
-                                <option th:each="option: ${typeOptions}"
-                                        th:value="${option}"
-                                        th:text="${option}">
-                                </option>
-                            </select>
-                            <div class="text-danger" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
-                        </div>
-
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Cancel
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            Save
-                        </button>
-                    </div>
-
-
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-
 </div>
 
 <!--Sorting-->
-<div class="container-fluid">
+<div class="container-fluid m-3">
 
     <table class="table table-bordered table-hover">
         <thead>
@@ -167,27 +194,39 @@
     </div>
 
     <!--Filter-->
-    <div class="col-md-3">
-        <div class="card p-3">
-            <h5>Filters</h5>
-            <form method="get" th:action="@{home}">
-                <div class="mb-2">
-                    <label class="form-label">Type</label>
-                    <select class="form-select" name="type">
-                        <option th:each="option : ${typeOptions}"
-                                th:text="${option}"
-                                th:value="${option}">
-                        </option>
-                    </select>
-                </div>
-                <button class="btn btn-outline-primary w-100 mt-2">Apply</button>
-            </form>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 justify-content-center">
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5>Filters</h5>
+                <form method="get" th:action="@{home}">
+                    <!--Other-->
+                    <input type="hidden" name="sortField" th:value="${sortField}"/>
+                    <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
+                    <input type="hidden" name="search" th:value="${search}"/>
+
+                    <div class="mb-2">
+                        <label class="form-label">Type</label>
+                        <div th:each="option : ${typeOptions}" class="form-check">
+                            <input type="checkbox"
+                                   class="form-check-input"
+                                   name="types"
+                                   th:value="${option}"
+                                   th:id="${'type_' + option}"
+                                   th:checked="${types.contains(option.name())}">
+
+                            <label class="form-check-label" th:for="${'type_' + option}"
+                                   th:text="${option}"></label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary w-100 mt-2">Apply</button>
+                </form>
+            </div>
         </div>
     </div>
+
 </div>
 
-
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 justify-content-around">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 justify-content-around">
     <div class="col" th:each="resource : ${resources}">
         <a th:href="@{'/resource/' + ${resource.id}}" class="text-decoration-none text-reset">
             <div class="card text-center border-primary-subtle shadow-sm h-100 " style="width: 18rem;">
@@ -219,54 +258,41 @@
 
 <p class="text-center" th:text="'Total resources: ' + ${totalElements}"></p>
 
-<nav class="d-flex justify-content-center">
-    <ul class="pagination">
+<form method="get" th:action="@{/home}">
 
-        <!-- Previous -->
-        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-            <!-- With sort -->
-            <a class="page-link"
-               th:if="${sortField != null and sortDirection != null}"
-               th:href="@{/home(page=${currentPage - 1}, sortField=${sortField}, sortDirection=${sortDirection})}">Previous</a>
+    <!--Other-->
+    <input type="hidden" name="sortField" th:value="${sortField}"/>
+    <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
+    <div th:each="type : ${types}">
+        <input type="hidden" name="types" th:value="${type}"/>
+    </div>
+    <input type="hidden" name="search" th:value="${search}"/>
 
-            <!-- Without sort -->
-            <a class="page-link"
-               th:unless="${sortField != null and sortDirection != null}"
-               th:href="@{/home(page=${currentPage - 1})}">Previous</a>
-        </li>
+    <!--Page-->
+    <nav class="d-flex justify-content-center">
+        <ul class="pagination">
+            <!-- Previous -->
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <button type="submit" class="page-link" name="page" th:value="${currentPage - 1}"
+                        disabled="${currentPage == 0}">Previous
+                </button>
+            </li>
 
-        <!-- Page Numbers -->
-        <li class="page-item"
-            th:each="i : ${#numbers.sequence(startPage, endPage)}"
-            th:classappend="${i == currentPage} ? 'active'">
+            <!-- Page Numbers -->
+            <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <button type="submit" class="page-link" name="page" th:value="${i}" th:text="${i + 1}"></button>
+            </li>
 
-            <!-- With sort -->
-            <a class="page-link"
-               th:if="${sortField != null and sortDirection != null}"
-               th:href="@{/home(page=${i}, sortField=${sortField}, sortDirection=${sortDirection})}"
-               th:text="${i + 1}"></a>
-
-            <!-- Without sort -->
-            <a class="page-link"
-               th:unless="${sortField != null and sortDirection != null}"
-               th:href="@{/home(page=${i})}"
-               th:text="${i + 1}"></a>
-        </li>
-
-        <!-- Next -->
-        <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
-            <!-- With sort -->
-            <a class="page-link"
-               th:if="${sortField != null and sortDirection != null}"
-               th:href="@{/home(page=${currentPage + 1}, sortField=${sortField}, sortDirection=${sortDirection})}">Next</a>
-
-            <!-- Without sort -->
-            <a class="page-link"
-               th:unless="${sortField != null and sortDirection != null}"
-               th:href="@{/home(page=${currentPage + 1})}">Next</a>
-        </li>
-    </ul>
-</nav>
+            <!-- Next -->
+            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                <button type="submit" class="page-link" name="page" th:value="${currentPage + 1}"
+                        disabled="${currentPage + 1 >= totalPages}">Next
+                </button>
+            </li>
+        </ul>
+    </nav>
+</form>
 
 </div>
 

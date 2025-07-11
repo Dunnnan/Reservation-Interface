@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class ResourceController {
             @RequestParam(name = "sortDirection", required = false) String sortDirection,
             @RequestParam(name = "page") Optional<Integer> page,
             @RequestParam(name = "size") Optional<Integer> size,
-            @RequestParam(name = "type") Optional<List<String>> types,
+            @RequestParam(name = "types") Optional<List<String>> types,
             @RequestParam(name = "search") Optional<String> search,
             @RequestParam(name = "typeOptions") Optional<List<String>> typeOptions,
             @ModelAttribute("resource") ResourceDto resource
@@ -45,9 +46,9 @@ public class ResourceController {
 
         // Handle Sort parameters
         Sort sort = Sort.by(
-                Sort.Direction.fromString(
-                        Optional.ofNullable(sortDirection).orElse("asc")),
-                Optional.ofNullable(sortField).orElse("id")
+                Sort.Direction.fromString(sortDirection == null ||
+                        sortDirection.isEmpty() ? "asc" : sortDirection),
+                sortField == null || sortField.isEmpty() ? "id" : sortField
         );
 
         // Handle Resources loading
@@ -88,10 +89,10 @@ public class ResourceController {
         model.addAttribute("reverseSortDirection", sortDirection != null && sortDirection.equals("asc") ? "desc" : "asc");
 
         // Filter
-        model.addAttribute("types", types);
+        model.addAttribute("types", types.orElse(Collections.emptyList()));
 
         // Search
-        model.addAttribute("search", search);
+        model.addAttribute("search", search.orElse(null));
 
         // Types
         model.addAttribute("typeOptions", Arrays.asList(ResourceType.values()));
@@ -111,7 +112,7 @@ public class ResourceController {
             Model model
     ) throws IOException {
 
-        // Validate sent image (if it's image)
+        // Validate sent image (if it's an image)
         if (!resourceService.isImage(resource.getImage())) {
             result.rejectValue("image", "error.image", "File is not an image");
         }
