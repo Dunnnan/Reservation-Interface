@@ -14,6 +14,17 @@
             padding: 5px;
             font-size: 0.9rem;
         }
+        .resource-card:hover {
+            background-color: #f0f8ff;
+            border-color: #f0f8ff;
+            box-shadow: 0 4px 10px rgba(240, 248, 255, 0.7);
+        }
+        .resource-card {
+            transition:
+                background-color 0.5s ease,
+                border-color 0.5s ease,
+                box-shadow 0.5s ease;
+        }
     </style>
 </head>
 
@@ -226,10 +237,11 @@
 
 </div>
 
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 justify-content-around">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
     <div class="col" th:each="resource : ${resources}">
-        <a th:href="@{'/resource/' + ${resource.id}}" class="text-decoration-none text-reset">
-            <div class="card text-center border-primary-subtle shadow-sm h-100 " style="width: 18rem;">
+        <div class="card text-center border-primary-subtle shadow-sm h-100 resource-card">
+            <a th:href="@{'/resource/' + ${resource.id}}"
+               class="text-decoration-none text-reset flex-grow-1 d-flex flex-column">
                 <img th:src="@{'/images/' + ${resource.imageName}   }" class="card-img-top" alt="Image">
                 <div class="card-body">
                     <h5 class="card-title" th:text="${resource.name}">Resource Title</h5>
@@ -237,12 +249,17 @@
                           th:text="${resource.type}"
                           th:style="bg-primary-subtle">
                     </span>
-                    <div sec:authorize="hasRole('EMPLOYEE')">
-                        <button type="button">Edit</button>
-                    </div>
+                </div>
+
+            </a>
+
+            <div class="card-footer">
+                <div sec:authorize="hasRole('EMPLOYEE')">
+                    <button type="button" class="btn btn-outline-primary ">Edit</button>
                 </div>
             </div>
-        </a>
+
+        </div>
     </div>
 </div>
 
@@ -293,8 +310,6 @@
         </ul>
     </nav>
 </form>
-
-</div>
 
 </body>
 </html>

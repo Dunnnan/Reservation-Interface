@@ -1,5 +1,6 @@
 package com.dunnnan.reservations.service;
 
+import com.dunnnan.reservations.config.PaginationConfig;
 import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
 import com.dunnnan.reservations.model.dto.ResourceDto;
@@ -7,12 +8,15 @@ import com.dunnnan.reservations.repository.ResourceRepository;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -23,6 +27,9 @@ public class ResourceService {
 
     @Autowired
     private FileStorageService fileStorageService;
+
+    @Autowired
+    private PaginationConfig paginationConfig;
 
     public Page<Resource> getAllResources(Pageable pageable) {
         return resourceRepository.findAll(pageable);
@@ -42,6 +49,82 @@ public class ResourceService {
 
     public Page<Resource> getResourcesByTypeAndName(Pageable page, List<String> types, String search) {
         return resourceRepository.findByTypeInAndNameContainingIgnoreCase(page, types, search);
+    }
+
+    public Sort getSort(String sortDirection, String sortField) {
+        return Sort.by(
+                Sort.Direction.fromString(sortDirection == null ||
+                        sortDirection.isEmpty() ? "asc" : sortDirection),
+                sortField == null || sortField.isEmpty() ? "id" : sortField
+        );
+    }
+
+    public Pageable getPageable(Optional<Integer> page, Optional<Integer> size, Sort sort) {
+        int currentPage = page.orElse(0);
+        int pageSize = size.orElse(paginationConfig.getDefaultPageSize());
+
+        return PageRequest.of(currentPage, pageSize, sort);
+    }
+
+    public Page<Resource> getResourcePage(Pageable pageable, Optional<List<String>> types, Optional<String> search) {
+        // All
+        if (types.isEmpty() && search.isEmpty()) {
+            return getAllResources(pageable);
+        }
+        // Search
+        else if (types.isEmpty()) {
+            return getResourcesByName(pageable, search.get());
+        }
+        // Filter
+        else if (search.isEmpty()) {
+            return getResourcesByTypeIn(pageable, types.get());
+        }
+        // Search & Filter
+        else {
+            return getResourcesByTypeAndName(pageable, types.get(), search.get());
+        }
+    }
+
+    public Map<String, Integer> getPageNavigationParameters(
+            Optional<Integer> page,
+            int totalPages
+    ) {
+
+        // Handle Page parameter
+        int currentPage = page.orElse(0);
+
+        // Handle navigation parameters
+        int startPage = 0;
+        int endPage = 0;
+
+        if (totalPages > 0) {
+            startPage = Math.max(0, currentPage - 4);
+            endPage = Math.min(totalPages - 1, currentPage + 5);
+        }
+
+        return Map.of(
+                "startPage", startPage,
+                "endPage", endPage
+        );
+    }
+
+    public Page<Resource> loadResourcePage(
+            String sortField,
+            String sortDirection,
+            Optional<Integer> page,
+            Optional<Integer> size,
+            Optional<List<String>> types,
+            Optional<String> search
+    ) {
+        // Handle Page parameters
+        Sort sort = getSort(sortDirection, sortField);
+        Pageable pageable = getPageable(page, size, sort);
+
+        return getResourcePage(pageable, types, search);
+    }
+
+    public String reverseDirection(String direction) {
+        return "asc".equalsIgnoreCase(direction) ? "desc" : "asc";
     }
 
     public boolean isImage(MultipartFile file) throws IOException {
