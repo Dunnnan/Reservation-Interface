@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.*;
@@ -34,8 +35,7 @@ public class ResourceController {
             @RequestParam(name = "size") Optional<Integer> size,
             @RequestParam(name = "types") Optional<List<String>> types,
             @RequestParam(name = "search") Optional<String> search,
-            @RequestParam(name = "typeOptions") Optional<List<String>> typeOptions,
-            @ModelAttribute("resource") ResourceDto resource
+            @RequestParam(name = "typeOptions") Optional<List<String>> typeOptions
     ) {
 
         // Load Resource Page
@@ -68,7 +68,9 @@ public class ResourceController {
         model.addAttribute("typeOptions", Arrays.asList(ResourceType.values()));
 
         // New Resource dto
-        model.addAttribute("resource", new ResourceDto());
+        if (!model.containsAttribute("resource")) {
+            model.addAttribute("resource", new ResourceDto());
+        }
 
         // Data
         model.addAttribute("resources", resourcePage);
@@ -79,7 +81,8 @@ public class ResourceController {
     public String addResource(
             @ModelAttribute("resource") @Validated ResourceDto resource,
             BindingResult result,
-            Model model
+            Model model,
+            RedirectAttributes redirectAttributes
     ) throws IOException {
 
         // Validate sent image (if it's an image)
@@ -95,6 +98,9 @@ public class ResourceController {
         }
 
         if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.resource", result);
+            redirectAttributes.addFlashAttribute("resource", resource);
+            redirectAttributes.addFlashAttribute("showModal", true);
             return "redirect:/home";
         }
 

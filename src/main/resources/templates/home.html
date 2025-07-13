@@ -28,46 +28,48 @@
     </style>
 </head>
 
-<body>
+<body class="min-vh-100 justify-content align-items-center">
+<div class="container py-5">
 
-<!--Webpage navigation bar-->
-<nav class="navbar navbar-expand-md bg-body-tertiary">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Home</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <!--Webpage navigation bar-->
+    <nav class="navbar navbar-expand-md bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Home</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">
-                        Home
-                        <span class="sr-only"></span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Reservations</a>
-                </li>
-            </ul>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            Home
+                            <span class="sr-only"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Reservations</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
-<!--Search row-->
-<div class="container mt-4 p-3">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <form role="search">
-                <!--Other-->
-                <input type="hidden" name="sortField" th:value="${sortField}"/>
-                <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
-                <div th:each="type : ${types}">
-                    <input type="hidden" name="types" th:value="${type}"/>
-                </div>
+    <!--Search row-->
+    <div class="container mt-4 p-3">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form role="search">
+                    <!--Other-->
+                    <input type="hidden" name="sortField" th:value="${sortField}"/>
+                    <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
+                    <div th:each="type : ${types}">
+                        <input type="hidden" name="types" th:value="${type}"/>
+                    </div>
 
-                <div class="input-group">
+                    <div class="input-group">
                     <span class="input-group-text">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                              class="bi bi-search"
@@ -76,240 +78,250 @@
                         </svg>
                     </span>
 
-                    <input type="search"
-                           class="form-control"
-                           placeholder="Search..."
-                           aria-label="Search"
-                           name="search"
-                           th:value="${search}">
+                        <input type="search"
+                               class="form-control"
+                               placeholder="Search..."
+                               aria-label="Search"
+                               name="search"
+                               th:value="${search}">
 
-                    <button type="submit"
-                            class="btn btn-outline-primary">
-                        Search
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!--Add resource-->
-<div sec:authorize="hasRole('EMPLOYEE')">
-
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 justify-content-center">
-        <button type="button" class="btn btn-outline-primary md-4 p-3" data-bs-toggle="modal"
-                data-bs-target="#addResourceModal">
-            Add Resource
-        </button>
-
-        <div class="modal fade" id="addResourceModal" tabindex="-1" aria-labelledby="addResourceModal"
-             aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form th:action="@{/resource}" th:object="${resource}" method="post" enctype="multipart/form-data">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addResourceModalLabel">
-                                Add Resource
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-
-                        <div class="modal-body">
-                            <!--Name-->
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Name</label>
-                                <input type="text" th:field="*{name}" class="form-control" id="name" required/>
-                                <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-                            </div>
-
-                            <!--Description-->
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description</label>
-                                <input type="text" th:field="*{description}" class="form-control" id="description"
-                                       required/>
-                                <div class="text-danger" th:if="${#fields.hasErrors('description')}"
-                                     th:errors="*{description}"></div>
-                            </div>
-
-                            <!--Image-->
-                            <div class="mb-3">
-                                <label for="image" class="form-label">Image</label>
-                                <input type="file" th:field="*{image}" class="form-control" id="image" alt="Image"
-                                       required/>
-                                <div class="text-danger" th:if="${#fields.hasErrors('image')}"
-                                     th:errors="*{image}"></div>
-                            </div>
-
-                            <!--Type-->
-                            <div class="mb-3">
-                                <label for="type" class="form-label">Type</label>
-                                <select th:field="*{type}" class="form-select" id="type" required>
-                                    <option th:each="option: ${typeOptions}"
-                                            th:value="${option}"
-                                            th:text="${option}">
-                                    </option>
-                                </select>
-                                <div class="text-danger" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
-                            </div>
-
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                Cancel
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                Save
-                            </button>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!--Sorting-->
-<div class="container-fluid m-3">
-
-    <table class="table table-bordered table-hover">
-        <thead>
-        <tr>
-            <th>
-                <a th:href="@{/home(sortField='id', sortDirection=${reverseSortDirection})}">ID</a>
-            </th>
-            <th>
-                <a th:href="@{/home(sortField='name', sortDirection=${reverseSortDirection})}">Name</a>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="resource : ${resources}">
-            <td th:text="${resource.id}"></td>
-            <td th:text="${resource.name}"></td>
-        </tr>
-        </tbody>
-    </table>
-
-    <div class="row mt-4">
-        <div class="col-md-9">
-            <div class="d-flex justify-content-between mb-3">
-                <div><strong>Sort by:</strong></div>
-                <div>
-                    <a href="#" class="btn btn-sm btn-outline-secondary">Name</a>
-                    <a href="#" class="btn btn-sm btn-outline-secondary">Type</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!--Filter-->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 justify-content-center">
-        <div class="col-md-4">
-            <div class="card p-3">
-                <h5>Filters</h5>
-                <form method="get" th:action="@{home}">
-                    <!--Other-->
-                    <input type="hidden" name="sortField" th:value="${sortField}"/>
-                    <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
-                    <input type="hidden" name="search" th:value="${search}"/>
-
-                    <div class="mb-2">
-                        <label class="form-label">Type</label>
-                        <div th:each="option : ${typeOptions}" class="form-check">
-                            <input type="checkbox"
-                                   class="form-check-input"
-                                   name="types"
-                                   th:value="${option}"
-                                   th:id="${'type_' + option}"
-                                   th:checked="${types.contains(option.name())}">
-
-                            <label class="form-check-label" th:for="${'type_' + option}"
-                                   th:text="${option}"></label>
-                        </div>
+                        <button type="submit"
+                                class="btn btn-outline-primary">
+                            Search
+                        </button>
                     </div>
-                    <button type="submit" class="btn btn-outline-primary w-100 mt-2">Apply</button>
                 </form>
             </div>
         </div>
     </div>
 
-</div>
+    <!--Add resource-->
+    <div sec:authorize="hasRole('EMPLOYEE')">
 
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-    <div class="col" th:each="resource : ${resources}">
-        <div class="card text-center border-primary-subtle shadow-sm h-100 resource-card">
-            <a th:href="@{'/resource/' + ${resource.id}}"
-               class="text-decoration-none text-reset flex-grow-1 d-flex flex-column">
-                <img th:src="@{'/images/' + ${resource.imageName}   }" class="card-img-top" alt="Image">
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${resource.name}">Resource Title</h5>
-                    <span class="type-badge"
-                          th:text="${resource.type}"
-                          th:style="bg-primary-subtle">
-                    </span>
-                </div>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 justify-content-center">
+            <button type="button" class="btn btn-outline-primary md-4 p-3" data-bs-toggle="modal"
+                    data-bs-target="#addResourceModal">
+                Add Resource
+            </button>
 
-            </a>
+            <div class="modal fade" id="addResourceModal" tabindex="-1" aria-labelledby="addResourceModal"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form th:action="@{/resource}" th:object="${resource}" method="post"
+                              enctype="multipart/form-data">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addResourceModalLabel">
+                                    Add Resource
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
 
-            <div class="card-footer">
-                <div sec:authorize="hasRole('EMPLOYEE')">
-                    <button type="button" class="btn btn-outline-primary ">Edit</button>
+                            <div class="modal-body">
+                                <!--Name-->
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Name</label>
+                                    <input type="text" th:field="*{name}" class="form-control" id="name" required/>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('name')}"
+                                         th:errors="*{name}"></div>
+                                </div>
+
+                                <!--Description-->
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <input type="text" th:field="*{description}" class="form-control" id="description"
+                                           required/>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('description')}"
+                                         th:errors="*{description}"></div>
+                                </div>
+
+                                <!--Image-->
+                                <div class="mb-3">
+                                    <label for="image" class="form-label">Image</label>
+                                    <input type="file" th:field="*{image}" class="form-control" id="image" alt="Image"
+                                           required/>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('image')}"
+                                         th:errors="*{image}"></div>
+                                </div>
+
+                                <!--Type-->
+                                <div class="mb-3">
+                                    <label for="type" class="form-label">Type</label>
+                                    <select th:field="*{type}" class="form-select" id="type" required>
+                                        <option th:each="option: ${typeOptions}"
+                                                th:value="${option}"
+                                                th:text="${option}">
+                                        </option>
+                                    </select>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('type')}"
+                                         th:errors="*{type}"></div>
+                                </div>
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    Save
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
-</div>
 
-<div th:if="${resources == null}">
-    <h1>No resources available.</h1>
-</div>
-<div th:if="${resources != null}">
-    <h1>Resources available.</h1>
-</div>
-<div th:if="${not resources.hasContent()}">
-    <h1>Resources are available but list is empty.</h1>
-</div>
+    <!--Sorting-->
+    <div class="container pyb-5 m-3">
+        <div class="row mt-4 justify-content-center">
+            <div class="col-md-6 text-center m-3">
 
-<p class="text-center" th:text="'Total resources: ' + ${totalElements}"></p>
+                <strong>
+                    Sort by:<br>
+                </strong>
 
-<form method="get" th:action="@{/home}">
+                <form method="get" th:action="@{/home}">
 
-    <!--Other-->
-    <input type="hidden" name="sortField" th:value="${sortField}"/>
-    <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
-    <div th:each="type : ${types}">
-        <input type="hidden" name="types" th:value="${type}"/>
+                    <!--Other-->
+                    <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
+                    <div th:each="type : ${types}">
+                        <input type="hidden" name="types" th:value="${type}"/>
+                    </div>
+                    <input type="hidden" name="search" th:value="${search}"/>
+
+                    <div class="btn-group" role="group" aria-label="Sort buttons">
+                        <input type="radio" class="btn-check" name="sortField" id="sortName" value="name"
+                               th:checked="${sortField == 'name'}" onchange="this.form.submit()">
+                        <label class="btn btn-outline-primary" for="sortName">Name</label>
+
+                        <input type="radio" class="btn-check" name="sortField" id="sortType" value="type"
+                               th:checked="${sortField == 'type'}" onchange="this.form.submit()">
+                        <label class="btn btn-outline-primary" for="sortType">Type</label>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!--Filter-->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 justify-content-center">
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <h5>Filters</h5>
+                    <form method="get" th:action="@{home}">
+                        <!--Other-->
+                        <input type="hidden" name="sortField" th:value="${sortField}"/>
+                        <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
+                        <input type="hidden" name="search" th:value="${search}"/>
+
+                        <div class="mb-2">
+                            <label class="form-label">Type</label>
+                            <div th:each="option : ${typeOptions}" class="form-check">
+                                <input type="checkbox"
+                                       class="form-check-input"
+                                       name="types"
+                                       th:value="${option}"
+                                       th:id="${'type_' + option}"
+                                       th:checked="${types.contains(option.name())}">
+
+                                <label class="form-check-label" th:for="${'type_' + option}"
+                                       th:text="${option}"></label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary w-100 mt-2">Apply</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <input type="hidden" name="search" th:value="${search}"/>
 
-    <!--Page-->
-    <nav class="d-flex justify-content-center">
-        <ul class="pagination">
-            <!-- Previous -->
-            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <button type="submit" class="page-link" name="page" th:value="${currentPage - 1}"
-                        disabled="${currentPage == 0}">Previous
-                </button>
-            </li>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+        <div class="col" th:each="resource : ${resources}">
+            <div class="card text-center border-primary-subtle shadow-sm h-100 resource-card">
+                <a th:href="@{'/resource/' + ${resource.id}}"
+                   class="text-decoration-none text-reset flex-grow-1 d-flex flex-column">
+                    <img th:src="@{'/images/' + ${resource.imageName}   }" class="card-img-top"
+                         style="max-height: 500px;" alt="Image">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${resource.name}">Resource Title</h5>
+                        <span class="type-badge"
+                              th:text="${resource.type}"
+                              th:style="bg-primary-subtle">
+                    </span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
 
-            <!-- Page Numbers -->
-            <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
-                th:classappend="${i == currentPage} ? 'active'">
-                <button type="submit" class="page-link" name="page" th:value="${i}" th:text="${i + 1}"></button>
-            </li>
+    <div class="text-center">
+        <div th:if="${resources == null}">
+            <h1>No resources available.</h1>
+        </div>
+        <div th:if="${resources != null}">
+            <h1>Resources available.</h1>
+        </div>
+        <div th:if="${not resources.hasContent()}">
+            <h1>Resources are available but list is empty.</h1>
+        </div>
+    </div>
 
-            <!-- Next -->
-            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
-                <button type="submit" class="page-link" name="page" th:value="${currentPage + 1}"
-                        disabled="${currentPage + 1 >= totalPages}">Next
-                </button>
-            </li>
-        </ul>
-    </nav>
-</form>
+    <p class="text-center" th:text="'Total resources: ' + ${totalElements}"></p>
 
+    <form method="get" th:action="@{/home}">
+
+        <!--Other-->
+        <input type="hidden" name="sortField" th:value="${sortField}"/>
+        <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
+        <div th:each="type : ${types}">
+            <input type="hidden" name="types" th:value="${type}"/>
+        </div>
+        <input type="hidden" name="search" th:value="${search}"/>
+
+        <!--Page-->
+        <nav class="d-flex justify-content-center">
+            <ul class="pagination">
+                <!-- Previous -->
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <button type="submit" class="page-link" name="page" th:value="${currentPage - 1}">
+                        Previous
+                    </button>
+                </li>
+
+                <!-- Page Numbers -->
+                <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                    th:classappend="${i == currentPage} ? 'active'">
+                    <button type="submit" class="page-link" name="page" th:value="${i}" th:text="${i + 1}"></button>
+                </li>
+
+                <!-- Next -->
+                <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                    <button type="submit" class="page-link" name="page" th:value="${currentPage + 1}">
+                        Next
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </form>
+</div>
+
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    let showModal = /*[[${showModal} ? true : false]]*/ false;
+
+    if (showModal) {
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = new bootstrap.Modal(document.getElementById('addResourceModal'));
+            modal.show();
+        });
+    }
+    /*]]>*/
+</script>
 </body>
 </html>

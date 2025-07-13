@@ -23,7 +23,8 @@
                             <label for="surname" class="form-label">Surname</label>
                             <input type="text" th:field="*{surname}" class="form-control" id="surname" name="surname"
                                    required/>
-                            <div class="text-danger" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></div>
+                            <div class="text-danger" th:if="${#fields.hasErrors('surname')}"
+                                 th:errors="*{surname}"></div>
                         </div>
 
                         <div class="mb-3">

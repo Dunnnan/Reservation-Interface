@@ -1,16 +1,210 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="dark">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en"
+      data-bs-theme="dark">
 <head>
     <title>Resource</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
-
+    <style>
+        .type-badge {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 5px;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
-<body>
-<div>
-<h1 class="container py-5 text-center justify-content-center">
-    Soon beautiful description of resource details will be here.
-</h1>
+<body class="min-vh-100 d-flex justify-content align-items-center">
+
+<div class="container py-5">
+
+<!--Resource Card-->
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+            <div class="card shadow-sm border-primary-subtle">
+                <div class="card-body" th:object="${resource}">
+
+                    <!-- Image-->
+                    <div class="text-center mb-6">
+                        <img th:src="@{'/images/' + *{imageName}}" class="card-img-top img-fluid rounded" alt="Image">
+                    </div>
+
+                    <!-- Name -->
+                    <h2 class="text-center mb-3" th:text="*{name}">
+                        Resource Name
+                    </h2>
+
+                    <!-- Type -->
+                    <p class="mb-3 text-center">
+                        <span class="type-badge" th:text="*{type}">
+                            Resource type
+                        </span></p>
+
+                    <!-- Description -->
+                    <p class="mb-3">
+                        <strong>
+                            Description:<br>
+                        </strong>
+                        <span th:text="*{description}">
+                            Resource description
+                        </span>
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Reservation Form-->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+                <div class="card shadow-sm border-primary-subtle">
+                    <div class="card-body" th:object="${resource}">
+
+                        <form th:action="@{/reservation}" method="post">
+                            <!--Date-->
+                            <div class="mb-3">
+                                <label for="date" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="date" name="date" required>
+                            </div>
+                            <div th:if="${param.error}" class="alert alert-danger">
+                                Wrong date of the Reservation.
+                            </div>
+
+                            <!--Form-->
+                            <div class="mb-3">
+                                <label for="from" class="form-label">From</label>
+                                <input type="time" class="form-control" id="from" name="from" step="1800" required>
+                            </div>
+                            <div th:if="${param.error}" class="alert alert-danger">
+                                Wrong start time of the Reservation.
+                            </div>
+
+                            <!--To-->
+                            <div class="mb-3">
+                                <label for="to" class="form-label">To</label>
+                                <input type="time" class="form-control" id="to" name="to" step="1800" required>
+                            </div>
+                            <div th:if="${param.error}" class="alert alert-danger">
+                                Wrong end time of the Reservation.
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-outline-primary w-100 position-relative ">
+                                Reserve
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Calendar Display-->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+                <div class="card shadow-sm border-primary-subtle">
+                    <div class="card-body" th:object="${resource}">
+
+                        <h1 class="text-center justify-content-center">
+                            There will be a beautiful, dynamic visual interface of possible reservation periods of the
+                            resource for the week.
+                        </h1>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
+
 </body>
+
+
+<!--    Edit Resource-->
+<!--    <div class="card-footer" sec:authorize="hasRole('EMPLOYEE')">-->
+
+<!--        <button type="button" class="btn btn-outline-primary md-4 p-3" data-bs-toggle="modal"-->
+<!--                data-bs-target="#editResourceModal">-->
+<!--            Edit-->
+<!--        </button>-->
+
+<!--        <div class="modal fade" id="editResourceModal" tabindex="-1" aria-labelledby="editResourceModal"-->
+<!--             aria-hidden="true">-->
+<!--            <div class="modal-dialog">-->
+<!--                <div class="modal-content">-->
+<!--                    <form th:action="@{/resource}" th:object="${resource}" method="post"-->
+<!--                          enctype="multipart/form-data">-->
+<!--                        <div class="modal-header">-->
+<!--                            <h5 class="modal-title" id="editResourceModalLabel">-->
+<!--                                Add Resource-->
+<!--                            </h5>-->
+<!--                            <button type="button" class="btn-close" data-bs-dismiss="modal"-->
+<!--                                    aria-label="Close"></button>-->
+<!--                        </div>-->
+
+<!--                        <div class="modal-body">-->
+<!--                            &lt;!&ndash;Name&ndash;&gt;-->
+<!--                            <div class="mb-3">-->
+<!--                                <label for="name" class="form-label">Name</label>-->
+<!--                                <input type="text" th:field="*{name}" class="form-control" id="name" required/>-->
+<!--                                <div class="text-danger" th:if="${#fields.hasErrors('name')}"-->
+<!--                                     th:errors="*{name}"></div>-->
+<!--                            </div>-->
+
+<!--                            &lt;!&ndash;Description&ndash;&gt;-->
+<!--                            <div class="mb-3">-->
+<!--                                <label for="description" class="form-label">Description</label>-->
+<!--                                <input type="text" th:field="*{description}" class="form-control"-->
+<!--                                       id="description"-->
+<!--                                       required/>-->
+<!--                                <div class="text-danger" th:if="${#fields.hasErrors('description')}"-->
+<!--                                     th:errors="*{description}"></div>-->
+<!--                            </div>-->
+
+<!--                            &lt;!&ndash;Image&ndash;&gt;-->
+<!--                            <div class="mb-3">-->
+<!--                                <label for="image" class="form-label">Image</label>-->
+<!--                                <input type="file" th:field="*{image}" class="form-control" id="image"-->
+<!--                                       alt="Image"-->
+<!--                                       required/>-->
+<!--                                <div class="text-danger" th:if="${#fields.hasErrors('image')}"-->
+<!--                                     th:errors="*{image}"></div>-->
+<!--                            </div>-->
+
+<!--                            &lt;!&ndash;Type&ndash;&gt;-->
+<!--                            <div class="mb-3">-->
+<!--                                <label for="type" class="form-label">Type</label>-->
+<!--                                <select th:field="*{type}" class="form-select" id="type" required>-->
+<!--                                    <option th:each="option: ${typeOptions}"-->
+<!--                                            th:value="${option}"-->
+<!--                                            th:text="${option}">-->
+<!--                                    </option>-->
+<!--                                </select>-->
+<!--                                <div class="text-danger" th:if="${#fields.hasErrors('type')}"-->
+<!--                                     th:errors="*{type}"></div>-->
+<!--                            </div>-->
+
+<!--                        </div>-->
+
+<!--                        <div class="modal-footer">-->
+<!--                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">-->
+<!--                                Cancel-->
+<!--                            </button>-->
+<!--                            <button type="submit" class="btn btn-primary">-->
+<!--                                Save-->
+<!--                            </button>-->
+<!--                        </div>-->
+
+<!--                    </form>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+
 </html>
