@@ -34,11 +34,11 @@ public class LoginController {
             BindingResult result,
             Model model) {
         if (!appUser.getPassword().equals(appUser.getConfirmPassword())) {
-            result.rejectValue("confirmPassword", "error.user", "Passwords don't match");
+            result.rejectValue("confirmPassword", "error.user", "password error: Passwords don't match");
         }
 
         if (userService.emailExists(appUser.getEmail())) {
-            result.rejectValue("email", "error.user", "Email is already registered");
+            result.rejectValue("email", "error.user", "email error: Email is already registered");
         }
 
         if (result.hasErrors()) {
