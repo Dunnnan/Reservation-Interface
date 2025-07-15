@@ -4,6 +4,8 @@ import com.dunnnan.reservations.model.AppUser;
 import com.dunnnan.reservations.model.dto.AppUserDto;
 import com.dunnnan.reservations.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -42,6 +44,19 @@ public class UserService implements UserDetailsService {
                 appUserDto.getPassword()
         );
         userRepository.save(newUser);
+    }
+
+    //Data
+    public AppUser findUserId(Long id) {
+        return userRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("User with id: " + id + " was not found")
+        );
+    }
+
+    public Long getUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AppUser user = (AppUser) authentication.getPrincipal();
+        return user.getId();
     }
 
 }

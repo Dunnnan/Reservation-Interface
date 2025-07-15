@@ -2,7 +2,7 @@ package com.dunnnan.reservations.model;
 
 import jakarta.persistence.*;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.time.OffsetTime;
 
 @Entity
@@ -21,7 +21,7 @@ public class Reservation {
     private Resource resource;
 
     @Column(nullable = false, updatable = false)
-    private OffsetDateTime date;
+    private LocalDate date;
 
     @Column(nullable = false, updatable = false, name = "start_time")
     private OffsetTime from;
@@ -32,7 +32,7 @@ public class Reservation {
     public Reservation() {
     }
 
-    public Reservation(AppUser appUser, Resource resource, OffsetDateTime date, OffsetTime from, OffsetTime to) {
+    public Reservation(AppUser appUser, Resource resource, LocalDate date, OffsetTime from, OffsetTime to) {
         this.appUser = appUser;
         this.resource = resource;
         this.date = date;
@@ -64,11 +64,11 @@ public class Reservation {
         this.resource = resource;
     }
 
-    public OffsetDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(OffsetDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

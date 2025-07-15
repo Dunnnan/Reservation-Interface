@@ -2,7 +2,8 @@ package com.dunnnan.reservations.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
+import java.time.OffsetTime;
 
 public class ReservationDto {
 
@@ -12,11 +13,14 @@ public class ReservationDto {
     @NotBlank(message = "Resource id is required")
     private Long resourceId;
 
+    @NotBlank(message = "Reservation date is required")
+    private LocalDate date;
+
     @NotBlank(message = "Start time of reservation is required")
-    private OffsetDateTime from;
+    private OffsetTime from;
 
     @NotBlank(message = "End time of reservation is required")
-    private OffsetDateTime to;
+    private OffsetTime to;
 
     public ReservationDto() {
     }
@@ -37,19 +41,27 @@ public class ReservationDto {
         this.resourceId = resourceId;
     }
 
-    public @NotBlank(message = "Start time of reservation is required") OffsetDateTime getFrom() {
+    public @NotBlank(message = "Reservation date is required") LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(@NotBlank(message = "Reservation date is required") LocalDate date) {
+        this.date = date;
+    }
+
+    public @NotBlank(message = "Start time of reservation is required") OffsetTime getFrom() {
         return from;
     }
 
-    public void setFrom(@NotBlank(message = "Start time of reservation is required") OffsetDateTime from) {
+    public void setFrom(@NotBlank(message = "Start time of reservation is required") OffsetTime from) {
         this.from = from;
     }
 
-    public @NotBlank(message = "End time of reservation is required") OffsetDateTime getTo() {
+    public @NotBlank(message = "End time of reservation is required") OffsetTime getTo() {
         return to;
     }
 
-    public void setTo(@NotBlank(message = "End time of reservation is required") OffsetDateTime to) {
+    public void setTo(@NotBlank(message = "End time of reservation is required") OffsetTime to) {
         this.to = to;
     }
 }

@@ -143,4 +143,11 @@ public class ResourceService {
         resourceRepository.save(resource);
     }
 
+    // Find resource by id
+    public Resource findResourceById(Long id) {
+        return resourceRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Resource with id: " + id + " was not found")
+        );
+    }
+
 }
