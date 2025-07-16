@@ -11,7 +11,7 @@ Feature: Resource Reservation
     And picked term is free
     Then User should reserve resource
 
-  Scenario: User reserve resource unsuccessfully
+  Scenario: User reserve resource already occupied
     When User picks a certain day of reservation
     And User picks a from hour of reservation
     And User picks a to hour of reservation

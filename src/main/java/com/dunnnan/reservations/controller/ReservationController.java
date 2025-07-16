@@ -16,7 +16,7 @@ public class ReservationController {
     @Autowired
     private ReservationService reservationService;
 
-    @PostMapping("/reservation")
+    @PostMapping("/reserve")
     public String createReservation(
             @ModelAttribute("reservation") @Validated ReservationDto reservationDto,
             BindingResult result,
