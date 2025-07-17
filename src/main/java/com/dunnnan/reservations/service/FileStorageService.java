@@ -12,7 +12,7 @@ import java.util.UUID;
 @Service
 public class FileStorageService {
 
-    private final Path storageFolder = Paths.get("src/main/resources/static/images").toAbsolutePath();
+    private static final Path storageFolder = Paths.get("src/main/resources/static/images").toAbsolutePath();
 
     public String saveImage(MultipartFile file) throws IOException {
 

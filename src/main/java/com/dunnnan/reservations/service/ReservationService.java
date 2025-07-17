@@ -29,7 +29,7 @@ public class ReservationService {
 
     public void registerReservation(ReservationDto reservationDto) {
         Reservation reservation = new Reservation(
-                userService.findUserId(reservationDto.getUserId()),
+                userService.findUserId(userService.getUserId()),
                 resourceService.findResourceById(reservationDto.getResourceId()),
                 reservationDto.getDate(),
                 reservationDto.getFrom(),
@@ -39,6 +39,11 @@ public class ReservationService {
     }
 
     public BindingResult reserve(ReservationDto reservationDto, BindingResult result) {
+        if (resourceService.getResourceById(reservationDto.getResourceId()).isEmpty()) {
+            result.rejectValue("date", "error.date", "Resource doesn't exist!");
+            return result;
+        }
+
         if (!isReservationPeriodFree(
                 reservationDto.getDate(),
                 reservationDto.getResourceId(),

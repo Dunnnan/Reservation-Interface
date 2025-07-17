@@ -1,6 +1,7 @@
 package com.dunnnan.reservations.service;
 
 import com.dunnnan.reservations.config.PaginationConfig;
+import com.dunnnan.reservations.config.ReservationConfig;
 import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
 import com.dunnnan.reservations.model.dto.ResourceDto;
@@ -30,6 +31,16 @@ public class ResourceService {
 
     @Autowired
     private PaginationConfig paginationConfig;
+
+    @Autowired
+    private ReservationConfig reservationConfig;
+
+    @Autowired
+    private AvailabilityService availabilityService;
+
+    public List<Resource> getAllResources() {
+        return resourceRepository.findAll();
+    }
 
     public Page<Resource> getAllResources(Pageable pageable) {
         return resourceRepository.findAll(pageable);
@@ -141,6 +152,7 @@ public class ResourceService {
                 ResourceType.valueOf(resourceDto.getType())
         );
         resourceRepository.save(resource);
+        availabilityService.createDefaultAvailabilities(resource);
     }
 
     // Find resource by id

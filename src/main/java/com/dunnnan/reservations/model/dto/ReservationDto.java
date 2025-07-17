@@ -1,15 +1,11 @@
 package com.dunnnan.reservations.model.dto;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.time.OffsetTime;
 
 public class ReservationDto {
-
-    @NotNull(message = "User id is required")
-    private Long userId;
 
     @NotNull(message = "Resource id is required")
     private Long resourceId;
@@ -24,14 +20,6 @@ public class ReservationDto {
     private OffsetTime to;
 
     public ReservationDto() {
-    }
-
-    public @NotNull(message = "User id is required") Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(@NotNull(message = "User id is required") Long userId) {
-        this.userId = userId;
     }
 
     public @NotNull(message = "Resource id is required") Long getResourceId() {

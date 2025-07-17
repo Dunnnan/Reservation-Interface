@@ -99,32 +99,40 @@ public class ReservationTests {
                 .andExpect(flash().attributeExists("errorMessage"));
     }
 
-//    @Test
-//    public void shouldFailToReserveDueToNoAvailability() throws Exception {
-    // Needs the process of creating the availability at default after creating the resource
-//        mockMvc.perform(post("/reserve")
-//                        .param("resourceId", "1")
-//                        .param("date", LocalDate.now().toString())
-//                        .param("from", "15:00")
-//                        .param("to", "16:00")
-//                        .with(user("mail@com.pl").roles("RESERVATOR")))
-//                .andExpect(status().is3xxRedirection())
-//                .andExpect(view().name("redirect:/resource/1"))
-//                .andExpect(flash().attributeExists("errorMessage"));
-//    }
+    @Test
+    public void shouldFailToReserveDueToNoAvailability() throws Exception {
+        mockMvc.perform(post("/reserve")
+                        .param("resourceId", "4")
+                        .param("date", LocalDate.now().toString())
+                        .param("from", "15:00")
+                        .param("to", "16:00")
+                        .with(user("mail@com.pl").roles("RESERVATOR")))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/resource/4"))
+                .andExpect(flash().attributeExists("successMessage"));
+    }
 
-    //    @Test
-//    public void shouldFailToReserveDueToPeriodAlreadyOccupied() throws Exception {
-    // Needs the process of creating the availability at default after creating the resource
-//        mockMvc.perform(post("/reserve")
-//                        .param("resourceId", "1")
-//                        .param("date", LocalDate.now().toString())
-//                        .param("from", "15:00")
-//                        .param("to", "16:00")
-//                        .with(user("mail@com.pl").roles("RESERVATOR")))
-//                .andExpect(status().is3xxRedirection())
-//                .andExpect(view().name("redirect:/resource/1"))
-//                .andExpect(flash().attributeExists("errorMessage"));
-//    }
+    @Test
+    public void shouldFailToReserveDueToPeriodAlreadyOccupied() throws Exception {
+        mockMvc.perform(post("/reserve")
+                        .param("resourceId", "1")
+                        .param("date", LocalDate.now().toString())
+                        .param("from", "15:00")
+                        .param("to", "16:00")
+                        .with(user("mail@com.pl").roles("RESERVATOR")))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/resource/1"))
+                .andExpect(flash().attributeExists("successMessage"));
+
+        mockMvc.perform(post("/reserve")
+                        .param("resourceId", "1")
+                        .param("date", LocalDate.now().toString())
+                        .param("from", "15:00")
+                        .param("to", "16:00")
+                        .with(user("mail@com.pl").roles("RESERVATOR")))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/resource/1"))
+                .andExpect(flash().attributeExists("errorMessage"));
+    }
 
 }

@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.OffsetTime;
 
 @Entity
-public class ResourceAvailability {
+public class Availability {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,10 +29,10 @@ public class ResourceAvailability {
     private OffsetTime to;
 
 
-    public ResourceAvailability() {
+    public Availability() {
     }
 
-    public ResourceAvailability(Resource resource, LocalDate date, boolean isClosed, OffsetTime from, OffsetTime to) {
+    public Availability(Resource resource, LocalDate date, boolean isClosed, OffsetTime from, OffsetTime to) {
         this.resource = resource;
         this.date = date;
         this.isClosed = isClosed;

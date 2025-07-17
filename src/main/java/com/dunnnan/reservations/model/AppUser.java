@@ -1,12 +1,16 @@
 package com.dunnnan.reservations.model;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
-@Table(name="app_user")
-public class AppUser {
+@Table(name = "app_user")
+public class AppUser implements UserDetails {
 
 //    INSERT INTO app_user(name, surname, email, password, phone_number, balance, user_type) VALUES
 //('Mateo', 'Maldini', 'mail@com.pl', 'password', '111222333', 0, 'RESERVATOR')
@@ -27,14 +31,14 @@ public class AppUser {
     @Column(nullable = false, updatable = true)
     private String password;
 
-    @Column(nullable = false, updatable = true, name="phone_number")
+    @Column(nullable = false, updatable = true, name = "phone_number")
     private String phoneNumber;
 
     @Column(nullable = false, updatable = true)
     private BigDecimal balance = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, updatable = false, name="user_type")
+    @Column(nullable = false, updatable = false, name = "user_type")
     private UserType userType = UserType.RESERVATOR;
 
     public AppUser() {
@@ -90,12 +94,22 @@ public class AppUser {
         this.email = email;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(() -> "ROLE_" + userType.name());
+    }
+
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 
     public String getPhoneNumber() {

@@ -10,6 +10,8 @@ import java.time.ZoneOffset;
 @ConfigurationProperties(prefix = "reservation")
 public class ReservationConfig {
 
+    private short maxFrontReservationDays = 14;
+
     private OffsetTime openingTime = OffsetTime.of(
             8, 0, 0, 0, ZoneOffset.ofHours(1)
     );
@@ -32,5 +34,13 @@ public class ReservationConfig {
 
     public void setClosingTime(OffsetTime closingTime) {
         this.closingTime = closingTime;
+    }
+
+    public short getMaxFrontReservationDays() {
+        return maxFrontReservationDays;
+    }
+
+    public void setMaxFrontReservationDays(short maxFrontReservationDays) {
+        this.maxFrontReservationDays = maxFrontReservationDays;
     }
 }
