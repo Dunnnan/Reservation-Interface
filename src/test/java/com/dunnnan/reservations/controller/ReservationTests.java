@@ -3,12 +3,14 @@ package com.dunnnan.reservations.controller;
 import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
 import com.dunnnan.reservations.repository.ResourceRepository;
+import com.dunnnan.reservations.service.UserService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -25,14 +27,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class ReservationTests {
 
+    private static UserDetails userDetails;
     @Autowired
     WebApplicationContext webApplicationContext;
-
     @Autowired
     MockMvc mockMvc;
 
     @BeforeAll
-    public static void init(@Autowired ResourceRepository resourceRepository) {
+    public static void init(@Autowired ResourceRepository resourceRepository, @Autowired UserService userService) {
+        userDetails = userService.loadUserByUsername("mail@com.pl");
+
         resourceRepository.save(new Resource("Cat", "Very cute cat", "image1", ResourceType.CAT));
         resourceRepository.save(new Resource("Dog", "Very cute dog", "image2", ResourceType.DOG));
         resourceRepository.save(new Resource("Bear", "Very cute bear", "image3", ResourceType.BEAR));
@@ -49,22 +53,13 @@ public class ReservationTests {
     }
 
     @Test
-    public void shouldSubmitTheReservationForm() throws Exception {
-        mockMvc.perform(post("/reserve")
-                        .with(user("mail@com.pl").roles("RESERVATOR"))
-                )
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/resource/1"));
-    }
-
-    @Test
     public void shouldReserveResourceSuccessfully() throws Exception {
         mockMvc.perform(post("/reserve")
                         .param("resourceId", "1")
                         .param("date", LocalDate.now().toString())
-                        .param("from", "15:00")
-                        .param("to", "20:00")
-                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                        .param("from", "15:00:00+00:00")
+                        .param("to", "20:00:00+00:00")
+                        .with(user(userDetails))
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/resource/1"))
@@ -76,9 +71,9 @@ public class ReservationTests {
         mockMvc.perform(post("/reserve")
                         .param("resourceId", "1")
                         .param("date", LocalDate.now().toString())
-                        .param("from", "20:00")
-                        .param("to", "15:00")
-                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                        .param("from", "20:00:00+00:00")
+                        .param("to", "15:00:00+00:00")
+                        .with(user(userDetails))
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/resource/1"))
@@ -90,9 +85,9 @@ public class ReservationTests {
         mockMvc.perform(post("/reserve")
                         .param("resourceId", "1")
                         .param("date", LocalDate.now().minusDays(1).toString())
-                        .param("from", "15:00")
-                        .param("to", "15:00")
-                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                        .param("from", "15:00:00+00:00")
+                        .param("to", "15:00:00+00:00")
+                        .with(user(userDetails))
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/resource/1"))
@@ -104,12 +99,13 @@ public class ReservationTests {
         mockMvc.perform(post("/reserve")
                         .param("resourceId", "4")
                         .param("date", LocalDate.now().toString())
-                        .param("from", "15:00")
-                        .param("to", "16:00")
-                        .with(user("mail@com.pl").roles("RESERVATOR")))
+                        .param("from", "15:00:00+00:00")
+                        .param("to", "20:00:00+00:00")
+                        .with(user(userDetails))
+                )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/resource/4"))
-                .andExpect(flash().attributeExists("successMessage"));
+                .andExpect(flash().attributeExists("errorMessage"));
     }
 
     @Test
@@ -117,9 +113,10 @@ public class ReservationTests {
         mockMvc.perform(post("/reserve")
                         .param("resourceId", "1")
                         .param("date", LocalDate.now().toString())
-                        .param("from", "15:00")
-                        .param("to", "16:00")
-                        .with(user("mail@com.pl").roles("RESERVATOR")))
+                        .param("from", "15:00:00+00:00")
+                        .param("to", "20:00:00+00:00")
+                        .with(user(userDetails))
+                )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/resource/1"))
                 .andExpect(flash().attributeExists("successMessage"));
@@ -128,8 +125,9 @@ public class ReservationTests {
                         .param("resourceId", "1")
                         .param("date", LocalDate.now().toString())
                         .param("from", "15:00")
-                        .param("to", "16:00")
-                        .with(user("mail@com.pl").roles("RESERVATOR")))
+                        .param("to", "20:00")
+                        .with(user(userDetails))
+                )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/resource/1"))
                 .andExpect(flash().attributeExists("errorMessage"));

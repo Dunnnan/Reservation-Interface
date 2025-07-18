@@ -3,6 +3,7 @@ package com.dunnnan.reservations.controller;
 import com.dunnnan.reservations.config.PaginationConfig;
 import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
+import com.dunnnan.reservations.model.dto.ReservationDto;
 import com.dunnnan.reservations.model.dto.ResourceDto;
 import com.dunnnan.reservations.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,6 +119,7 @@ public class ResourceController {
         Optional<Resource> resource = resourceService.getResourceById(id);
         if (resource.isPresent()) {
             model.addAttribute("resource", resource.get());
+            model.addAttribute("reservation", new ReservationDto());
             return "resource-detail";
         }
         return "redirect:/home";

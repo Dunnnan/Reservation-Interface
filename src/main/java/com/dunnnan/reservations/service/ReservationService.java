@@ -24,7 +24,7 @@ public class ReservationService {
 
     public boolean isReservationPeriodFree(
             LocalDate date, Long id, OffsetTime from, OffsetTime to) {
-        return reservationRepository.findByDateAndResource_IdAndFromLessThanAndToGreaterThan(date, id, from, to).isEmpty();
+        return reservationRepository.findByDateAndResource_IdAndFromLessThanAndToGreaterThan(date, id, to, from).isEmpty();
     }
 
     public void registerReservation(ReservationDto reservationDto) {
