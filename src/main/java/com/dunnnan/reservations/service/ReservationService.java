@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
 import java.time.LocalDate;
-import java.time.OffsetTime;
+import java.time.LocalTime;
 
 @Service
 public class ReservationService {
@@ -22,8 +22,11 @@ public class ReservationService {
     @Autowired
     private ResourceService resourceService;
 
+    @Autowired
+    private AvailabilityService availabilityService;
+
     public boolean isReservationPeriodFree(
-            LocalDate date, Long id, OffsetTime from, OffsetTime to) {
+            LocalDate date, Long id, LocalTime from, LocalTime to) {
         return reservationRepository.findByDateAndResource_IdAndFromLessThanAndToGreaterThan(date, id, to, from).isEmpty();
     }
 
@@ -38,9 +41,27 @@ public class ReservationService {
         reservationRepository.save(reservation);
     }
 
+    public boolean timePeriodIsCorrect(LocalTime to, LocalTime from) {
+        return to.isBefore(from);
+    }
+
+    public boolean resourceExists(Long id) {
+        return resourceService.getResourceById(id).isPresent();
+    }
+
     public BindingResult reserve(ReservationDto reservationDto, BindingResult result) {
-        if (resourceService.getResourceById(reservationDto.getResourceId()).isEmpty()) {
+        if (timePeriodIsCorrect(reservationDto.getTo(), reservationDto.getFrom())) {
+            result.rejectValue("from", "error.from", "Resource reservation period is invalid!");
+            return result;
+        }
+
+        if (!resourceExists(reservationDto.getResourceId())) {
             result.rejectValue("date", "error.date", "Resource doesn't exist!");
+            return result;
+        }
+
+        if (!availabilityService.isAvailable(reservationDto.getDate(), reservationDto.getResourceId())) {
+            result.rejectValue("date", "error.date", "Resource isn't available in that day!");
             return result;
         }
 
@@ -51,6 +72,7 @@ public class ReservationService {
                 reservationDto.getTo()
         )) {
             result.rejectValue("from", "error.from", "Reservation period is already reserved!");
+            return result;
         }
 
         registerReservation(reservationDto);

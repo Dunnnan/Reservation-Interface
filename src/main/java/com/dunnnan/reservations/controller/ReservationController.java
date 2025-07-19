@@ -10,6 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class ReservationController {
@@ -24,7 +25,8 @@ public class ReservationController {
     public String createReservation(
             @ModelAttribute("reservation") @Validated ReservationDto reservationDto,
             BindingResult result,
-            Model model
+            Model model,
+            RedirectAttributes redirectAttributes
     ) {
 
         result = reservationService.reserve(reservationDto, result);
@@ -34,6 +36,7 @@ public class ReservationController {
             return "resource-detail";
         }
 
+        redirectAttributes.addFlashAttribute("success", "Reservation successful!");
         return "redirect:/resource/" + reservationDto.getResourceId();
     }
 

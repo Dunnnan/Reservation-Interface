@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -24,6 +25,17 @@ public class AvailabilityService {
         return availabilityRepository.findAll();
     }
 
+    public boolean isReservationPeriodAvailable(
+            LocalDate date, Long id, LocalTime from, LocalTime to) {
+        return availabilityRepository.findByDateAndResource_IdAndFromLessThanAndToGreaterThan(date, id, to, from).isEmpty();
+    }
+
+    public boolean isAvailable(
+            LocalDate date, Long resourceId
+    ) {
+        return !availabilityRepository.findByDateAndResource_Id(date, resourceId).isEmpty();
+    }
+
     public void createDefaultAvailabilities(Resource resource) {
         for (int dayNumber = 0; dayNumber < reservationConfig.getMaxFrontReservationDays(); dayNumber++) {
             availabilityRepository.save(new Availability(
@@ -36,6 +48,25 @@ public class AvailabilityService {
             );
         }
     }
+
+// //To ResourceService? --> Dependency Loop
+//    public void resetDefaultAvailabilities() {
+//        availabilityRepository.deleteAll();
+//        List<Resource> allResources = resourceService.getAllResources();
+//
+//        for (Resource resource : allResources) {
+//            for (int dayNumber = 0; dayNumber < reservationConfig.getMaxFrontReservationDays(); dayNumber++) {
+//                availabilityRepository.save(new Availability(
+//                                resource,
+//                                LocalDate.now().plusDays(dayNumber),
+//                                false,
+//                                reservationConfig.getOpeningTime(),
+//                                reservationConfig.getClosingTime()
+//                        )
+//                );
+//            }
+//        }
+//    }
 
     @Scheduled(cron = "0 0 0 * * *")
     public void scheduledDeletePastAvailabilities() {

@@ -3,7 +3,7 @@ package com.dunnnan.reservations.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.time.OffsetTime;
+import java.time.LocalTime;
 
 @Entity
 public class Availability {
@@ -23,16 +23,16 @@ public class Availability {
     private boolean isClosed;
 
     @Column(nullable = false, updatable = true, name = "start_time")
-    private OffsetTime from;
+    private LocalTime from;
 
     @Column(nullable = false, updatable = true, name = "end_time")
-    private OffsetTime to;
+    private LocalTime to;
 
 
     public Availability() {
     }
 
-    public Availability(Resource resource, LocalDate date, boolean isClosed, OffsetTime from, OffsetTime to) {
+    public Availability(Resource resource, LocalDate date, boolean isClosed, LocalTime from, LocalTime to) {
         this.resource = resource;
         this.date = date;
         this.isClosed = isClosed;
@@ -72,19 +72,19 @@ public class Availability {
         isClosed = closed;
     }
 
-    public OffsetTime getFrom() {
+    public LocalTime getFrom() {
         return from;
     }
 
-    public void setFrom(OffsetTime from) {
+    public void setFrom(LocalTime from) {
         this.from = from;
     }
 
-    public OffsetTime getTo() {
+    public LocalTime getTo() {
         return to;
     }
 
-    public void setTo(OffsetTime to) {
+    public void setTo(LocalTime to) {
         this.to = to;
     }
 }

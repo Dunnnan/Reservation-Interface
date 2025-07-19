@@ -3,8 +3,8 @@ package com.dunnnan.reservations.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.OffsetTime;
-import java.time.ZoneOffset;
+import java.time.LocalTime;
+import java.time.LocalTime;
 
 @Configuration
 @ConfigurationProperties(prefix = "reservation")
@@ -12,27 +12,28 @@ public class ReservationConfig {
 
     private short maxFrontReservationDays = 14;
 
-    private OffsetTime openingTime = OffsetTime.of(
-            8, 0, 0, 0, ZoneOffset.ofHours(1)
+    private LocalTime openingTime = LocalTime.of(
+            8, 0, 0, 0
     );
-    private OffsetTime closingTime = OffsetTime.of(
-            20, 0, 0, 0, ZoneOffset.ofHours(1)
+
+    private LocalTime closingTime = LocalTime.of(
+            20, 0, 0, 0
     );
 
 
-    public OffsetTime getOpeningTime() {
+    public LocalTime getOpeningTime() {
         return openingTime;
     }
 
-    public void setOpeningTime(OffsetTime openingTime) {
+    public void setOpeningTime(LocalTime openingTime) {
         this.openingTime = openingTime;
     }
 
-    public OffsetTime getClosingTime() {
+    public LocalTime getClosingTime() {
         return closingTime;
     }
 
-    public void setClosingTime(OffsetTime closingTime) {
+    public void setClosingTime(LocalTime closingTime) {
         this.closingTime = closingTime;
     }
 

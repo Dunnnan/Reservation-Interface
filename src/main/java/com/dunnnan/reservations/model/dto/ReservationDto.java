@@ -3,7 +3,7 @@ package com.dunnnan.reservations.model.dto;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
-import java.time.OffsetTime;
+import java.time.LocalTime;
 
 public class ReservationDto {
 
@@ -14,10 +14,10 @@ public class ReservationDto {
     private LocalDate date;
 
     @NotNull(message = "Start time of reservation is required")
-    private OffsetTime from;
+    private LocalTime from;
 
     @NotNull(message = "End time of reservation is required")
-    private OffsetTime to;
+    private LocalTime to;
 
     public ReservationDto() {
     }
@@ -38,19 +38,19 @@ public class ReservationDto {
         this.date = date;
     }
 
-    public @NotNull(message = "Start time of reservation is required") OffsetTime getFrom() {
+    public @NotNull(message = "Start time of reservation is required") LocalTime getFrom() {
         return from;
     }
 
-    public void setFrom(@NotNull(message = "Start time of reservation is required") OffsetTime from) {
+    public void setFrom(@NotNull(message = "Start time of reservation is required") LocalTime from) {
         this.from = from;
     }
 
-    public @NotNull(message = "End time of reservation is required") OffsetTime getTo() {
+    public @NotNull(message = "End time of reservation is required") LocalTime getTo() {
         return to;
     }
 
-    public void setTo(@NotNull(message = "End time of reservation is required") OffsetTime to) {
+    public void setTo(@NotNull(message = "End time of reservation is required") LocalTime to) {
         this.to = to;
     }
 }

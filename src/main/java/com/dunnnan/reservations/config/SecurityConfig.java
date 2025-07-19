@@ -25,8 +25,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                // ONLY DEVELOPMENT
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin()))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/login", "/register").permitAll()
+                        // ONLY DEVELOPMENT
+                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/resource").hasRole("EMPLOYEE")
                         .anyRequest().authenticated()
                 )
