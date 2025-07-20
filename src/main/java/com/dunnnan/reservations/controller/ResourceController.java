@@ -5,6 +5,7 @@ import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
 import com.dunnnan.reservations.model.dto.ReservationDto;
 import com.dunnnan.reservations.model.dto.ResourceDto;
+import com.dunnnan.reservations.service.ReservationService;
 import com.dunnnan.reservations.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,9 @@ public class ResourceController {
 
     @Autowired
     private ResourceService resourceService;
+
+    @Autowired
+    private ReservationService reservationService;
 
     @Autowired
     private PaginationConfig paginationConfig;
@@ -114,12 +118,26 @@ public class ResourceController {
     @GetMapping("/resource/{id}")
     public String resource(
             @PathVariable("id") Long id,
+            @RequestParam(defaultValue = "0") short weeksLater,
             Model model
     ) {
         Optional<Resource> resource = resourceService.getResourceById(id);
         if (resource.isPresent()) {
             model.addAttribute("resource", resource.get());
             model.addAttribute("reservation", new ReservationDto());
+
+//            LocalDate startDate = LocalDate.now().plusWeeks(weeksLater);
+//            List<LocalDate> weekDates = IntStream.range(0, 7)
+//                    .mapToObj(startDate::plusDays)
+//                    .toList();
+//            Map<LocalDate, List<LocalTime>> reserved = new HashMap<>();
+//            Map<LocalDate, List<LocalTime>> available = new HashMap<>();
+//
+//            for (LocalDate day : weekDates) {
+//                reserved.put(day, reservationService.getReservationsHoursForSpecificResourceAndDate(id, startDate));
+//                available.put(availabilityService.getAvailability(id, startDate));
+//            }
+
             return "resource-detail";
         }
         return "redirect:/home";

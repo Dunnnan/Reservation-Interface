@@ -41,8 +41,8 @@ public class ReservationService {
         reservationRepository.save(reservation);
     }
 
-    public boolean timePeriodIsCorrect(LocalTime to, LocalTime from) {
-        return to.isBefore(from);
+    public boolean timePeriodIsCorrectAndNotNull(LocalTime to, LocalTime from) {
+        return from.isBefore(to);
     }
 
     public boolean resourceExists(Long id) {
@@ -50,7 +50,8 @@ public class ReservationService {
     }
 
     public BindingResult reserve(ReservationDto reservationDto, BindingResult result) {
-        if (timePeriodIsCorrect(reservationDto.getTo(), reservationDto.getFrom())) {
+
+        if (!timePeriodIsCorrectAndNotNull(reservationDto.getTo(), reservationDto.getFrom())) {
             result.rejectValue("from", "error.from", "Resource reservation period is invalid!");
             return result;
         }

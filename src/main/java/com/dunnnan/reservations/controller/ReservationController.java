@@ -36,7 +36,7 @@ public class ReservationController {
             return "resource-detail";
         }
 
-        redirectAttributes.addFlashAttribute("success", "Reservation successful!");
+        redirectAttributes.addFlashAttribute("successMessage", "Reservation successful!");
         return "redirect:/resource/" + reservationDto.getResourceId();
     }
 

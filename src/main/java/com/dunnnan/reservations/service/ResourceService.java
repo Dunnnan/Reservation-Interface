@@ -1,7 +1,7 @@
 package com.dunnnan.reservations.service;
 
 import com.dunnnan.reservations.config.PaginationConfig;
-import com.dunnnan.reservations.config.ReservationConfig;
+import com.dunnnan.reservations.constants.ReservationConstants;
 import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
 import com.dunnnan.reservations.model.dto.ResourceDto;
@@ -16,9 +16,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 @Service
 public class ResourceService {
@@ -33,7 +37,7 @@ public class ResourceService {
     private PaginationConfig paginationConfig;
 
     @Autowired
-    private ReservationConfig reservationConfig;
+    private ReservationConstants reservationConstants;
 
     @Autowired
     private AvailabilityService availabilityService;
@@ -145,10 +149,12 @@ public class ResourceService {
     }
 
     public void addResource(ResourceDto resourceDto) throws IOException {
+        String imageName = fileStorageService.saveImage(resourceDto.getImage());
+
         Resource resource = new Resource(
                 resourceDto.getName(),
                 resourceDto.getDescription(),
-                fileStorageService.saveImage(resourceDto.getImage()),
+                imageName,
                 ResourceType.valueOf(resourceDto.getType())
         );
         resourceRepository.save(resource);
@@ -160,6 +166,32 @@ public class ResourceService {
         return resourceRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Resource with id: " + id + " was not found")
         );
+    }
+
+    public LocalDate calculateStartDate(LocalDate today, short weeksLater) {
+        return today.plusWeeks(weeksLater);
+    }
+
+    public List<LocalDate> getWeekDays(LocalDate startDate) {
+        return IntStream.range(0, 7)
+                .mapToObj(startDate::plusDays)
+                .toList();
+    }
+
+    // Do oddzielnej klasy
+    public Map<LocalDate, List<LocalTime>> getReservationWeekDisplayInfo(LocalDate today, short weeksLater) {
+        Map<LocalDate, List<LocalTime>> reservations = new HashMap<>();
+        Map<LocalDate, List<LocalTime>> availability = new HashMap<>();
+
+        LocalDate startDate = calculateStartDate(today, weeksLater);
+        List<LocalDate> weekDays = getWeekDays(startDate);
+
+        for (LocalDate day : weekDays) {
+//            reservations.put(day, reservationService.);
+//            availability.put(day, availabilityService.);
+        }
+
+        return reservations;
     }
 
 }

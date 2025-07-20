@@ -1,6 +1,6 @@
 package com.dunnnan.reservations.service;
 
-import com.dunnnan.reservations.config.ReservationConfig;
+import com.dunnnan.reservations.constants.ReservationConstants;
 import com.dunnnan.reservations.model.Availability;
 import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.repository.AvailabilityRepository;
@@ -19,10 +19,20 @@ public class AvailabilityService {
     private AvailabilityRepository availabilityRepository;
 
     @Autowired
-    private ReservationConfig reservationConfig;
+    private ReservationConstants reservationConstants;
 
     public List<Availability> getAllAvailabilities() {
         return availabilityRepository.findAll();
+    }
+
+    public Availability getAvailabilityOfSpecificResourceForSpecificDay(Long id, LocalDate date) {
+        return availabilityRepository.findByResource_IdAndDate(id, date).orElseThrow(() ->
+                new RuntimeException("Resource doesn't is not available for specified date."));
+    }
+
+    public List<LocalTime> getAvailabilityTimePeriod(Long id, LocalDate date) {
+        Availability availability = getAvailabilityOfSpecificResourceForSpecificDay(id, date);
+        return List.of(availability.getFrom(), availability.getTo());
     }
 
     public boolean isReservationPeriodAvailable(
@@ -37,13 +47,13 @@ public class AvailabilityService {
     }
 
     public void createDefaultAvailabilities(Resource resource) {
-        for (int dayNumber = 0; dayNumber < reservationConfig.getMaxFrontReservationDays(); dayNumber++) {
+        for (int dayNumber = 0; dayNumber < reservationConstants.getMaxFrontReservationDays(); dayNumber++) {
             availabilityRepository.save(new Availability(
                             resource,
                             LocalDate.now().plusDays(dayNumber),
                             false,
-                            reservationConfig.getOpeningTime(),
-                            reservationConfig.getClosingTime()
+                            reservationConstants.getOpeningTime(),
+                            reservationConstants.getClosingTime()
                     )
             );
         }
@@ -55,13 +65,13 @@ public class AvailabilityService {
 //        List<Resource> allResources = resourceService.getAllResources();
 //
 //        for (Resource resource : allResources) {
-//            for (int dayNumber = 0; dayNumber < reservationConfig.getMaxFrontReservationDays(); dayNumber++) {
+//            for (int dayNumber = 0; dayNumber < reservationConstants.getMaxFrontReservationDays(); dayNumber++) {
 //                availabilityRepository.save(new Availability(
 //                                resource,
 //                                LocalDate.now().plusDays(dayNumber),
 //                                false,
-//                                reservationConfig.getOpeningTime(),
-//                                reservationConfig.getClosingTime()
+//                                reservationConstants.getOpeningTime(),
+//                                reservationConstants.getClosingTime()
 //                        )
 //                );
 //            }
@@ -82,8 +92,8 @@ public class AvailabilityService {
                             availability.getResource(),
                             availability.getDate().plusDays(1),
                             false,
-                            reservationConfig.getOpeningTime(),
-                            reservationConfig.getClosingTime()
+                            reservationConstants.getOpeningTime(),
+                            reservationConstants.getClosingTime()
                     )
             );
         }

@@ -9,10 +9,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+import static com.dunnnan.reservations.constants.StorageConstants.RESOURCE_IMAGE_PATH;
+
 @Service
 public class FileStorageService {
 
-    private static final Path storageFolder = Paths.get("src/main/resources/static/images").toAbsolutePath();
+    private static final Path storageFolder = Paths.get(RESOURCE_IMAGE_PATH).toAbsolutePath();
 
     public String saveImage(MultipartFile file) throws IOException {
 

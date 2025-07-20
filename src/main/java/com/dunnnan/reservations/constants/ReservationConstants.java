@@ -1,14 +1,13 @@
-package com.dunnnan.reservations.config;
+package com.dunnnan.reservations.constants;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalTime;
-import java.time.LocalTime;
 
 @Configuration
 @ConfigurationProperties(prefix = "reservation")
-public class ReservationConfig {
+public class ReservationConstants {
 
     private short maxFrontReservationDays = 14;
 
