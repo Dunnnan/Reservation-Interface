@@ -41,6 +41,10 @@ public class ReservationService {
         reservationRepository.save(reservation);
     }
 
+    public boolean timePeriodIsNotInThePast(LocalTime to, LocalTime from) {
+        return LocalTime.now().isBefore(from);
+    }
+
     public boolean timePeriodIsCorrectAndNotNull(LocalTime to, LocalTime from) {
         return from.isBefore(to);
     }
@@ -50,6 +54,11 @@ public class ReservationService {
     }
 
     public BindingResult reserve(ReservationDto reservationDto, BindingResult result) {
+
+//        if (timePeriodIsNotInThePast(reservationDto.getTo(), reservationDto.getFrom())) {
+//            result.rejectValue("from", "error.from", "Resource reservation period is in the past!");
+//            return result;
+//        }
 
         if (!timePeriodIsCorrectAndNotNull(reservationDto.getTo(), reservationDto.getFrom())) {
             result.rejectValue("from", "error.from", "Resource reservation period is invalid!");

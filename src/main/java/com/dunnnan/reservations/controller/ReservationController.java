@@ -1,5 +1,6 @@
 package com.dunnnan.reservations.controller;
 
+import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.dto.ReservationDto;
 import com.dunnnan.reservations.service.ReservationService;
 import com.dunnnan.reservations.service.ResourceService;
@@ -11,6 +12,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Optional;
 
 @Controller
 public class ReservationController {
@@ -32,7 +35,13 @@ public class ReservationController {
         result = reservationService.reserve(reservationDto, result);
 
         if (result.hasErrors()) {
-            model.addAttribute("resource", resourceService.getResourceById(reservationDto.getResourceId()).orElse(null));
+            Optional<Resource> resource = resourceService.getResourceById(reservationDto.getResourceId());
+
+            if (resource.isEmpty()) {
+                return "redirect:/home";
+            }
+
+            model.addAttribute("resource", resource.get());
             return "resource-detail";
         }
 

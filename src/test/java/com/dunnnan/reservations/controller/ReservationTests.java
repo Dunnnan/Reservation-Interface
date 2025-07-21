@@ -15,8 +15,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+import org.testcontainers.shaded.org.bouncycastle.tsp.TSPUtil;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -32,15 +34,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ReservationTests {
 
     private static UserDetails userDetails;
-
-    private Long resourceId;
-
     @Autowired
     WebApplicationContext webApplicationContext;
-
     @Autowired
     MockMvc mockMvc;
-
+    private Long resourceId;
     @Autowired
     private ResourceRepository resourceRepository;
 
@@ -71,23 +69,54 @@ public class ReservationTests {
     }
 
     @Test
-    public void shouldReserveResourceSuccessfully() throws Exception {
+    public void shouldRedirectToHome() throws Exception {
         mockMvc.perform(post("/reserve")
-                        .param("resourceId", "6") // NOTE: This works only due to current state of db (needs separable db)
+                        .param("resourceId", "1000")
                         .param("date", LocalDate.now().toString())
                         .param("from", "15:00")
                         .param("to", "20:00")
                         .with(user(userDetails))
                 )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/resource/6"))
+                .andExpect(view().name("redirect:/home"));
+    }
+
+    @Test
+    public void shouldReserveResourceSuccessfully() throws Exception {
+        mockMvc.perform(post("/reserve")
+                        .param("resourceId", String.valueOf(resourceId)) // NOTE: This works only due to current state of db (needs separable db)
+                        .param("date", LocalDate.now().toString())
+                        .param("from", "15:00")
+                        .param("to", "20:00")
+                        .with(user(userDetails))
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/resource/" + resourceId))
                 .andExpect(flash().attributeExists("successMessage"));
     }
+
+//    @Test
+//    public void shouldFailToReserveDueToReservationPeriodBeingInThePast() throws Exception {
+//        LocalTime now = LocalTime.now();
+//        LocalTime from = now.minusHours(1);
+//        LocalTime to = now.plusHours(1);
+//
+//        mockMvc.perform(post("/reserve")
+//                        .param("resourceId", String.valueOf(resourceId))
+//                        .param("date", LocalDate.now().toString())
+//                        .param("from", String.valueOf(from))
+//                        .param("to", String.valueOf(to))
+//                        .with(user(userDetails))
+//                )
+//                .andExpect(status().isOk())
+//                .andExpect(view().name("resource-detail"))
+//                .andExpect(content().string(containsString("text-danger")));
+//    }
 
     @Test
     public void shouldFailToReserveDueToFromBeingLaterThanTo() throws Exception {
         mockMvc.perform(post("/reserve")
-                        .param("resourceId", "1")
+                        .param("resourceId", String.valueOf(resourceId))
                         .param("date", LocalDate.now().toString())
                         .param("from", "20:00")
                         .param("to", "15:00")
@@ -101,7 +130,7 @@ public class ReservationTests {
     @Test
     public void shouldFailToReserveDueToDateEarlierThanToday() throws Exception {
         mockMvc.perform(post("/reserve")
-                        .param("resourceId", "1")
+                        .param("resourceId", String.valueOf(resourceId))
                         .param("date", LocalDate.now().minusDays(1).toString())
                         .param("from", "15:00")
                         .param("to", "15:00")
@@ -129,18 +158,18 @@ public class ReservationTests {
     @Test
     public void shouldFailToReserveDueToPeriodAlreadyOccupied() throws Exception {
         mockMvc.perform(post("/reserve")
-                        .param("resourceId", "1")
+                        .param("resourceId", String.valueOf(resourceId))
                         .param("date", LocalDate.now().toString())
                         .param("from", "15:00")
                         .param("to", "20:00")
                         .with(user(userDetails))
                 )
-                .andExpect(status().isOk())
-                .andExpect(view().name("resource-detail"))
-                .andExpect(content().string(containsString("text-danger")));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/resource/" + resourceId))
+                .andExpect(flash().attributeExists("successMessage"));
 
         mockMvc.perform(post("/reserve")
-                        .param("resourceId", "1")
+                        .param("resourceId", String.valueOf(resourceId))
                         .param("date", LocalDate.now().toString())
                         .param("from", "15:00")
                         .param("to", "20:00")
