@@ -1,5 +1,6 @@
 package com.dunnnan.reservations.controller;
 
+import com.dunnnan.reservations.TestConfig;
 import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
 import com.dunnnan.reservations.repository.ResourceRepository;
@@ -10,13 +11,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cglib.core.Local;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.shaded.org.bouncycastle.tsp.TSPUtil;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -27,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
+@Import(TestConfig.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -47,6 +52,10 @@ public class ReservationTests {
 
     @Autowired
     private AvailabilityService availabilityService;
+
+    @Autowired
+    @Qualifier("fixedClock")
+    private Clock fixedClock;
 
     @BeforeAll
     public void init() {
@@ -95,23 +104,27 @@ public class ReservationTests {
                 .andExpect(flash().attributeExists("successMessage"));
     }
 
-//    @Test
-//    public void shouldFailToReserveDueToReservationPeriodBeingInThePast() throws Exception {
-//        LocalTime now = LocalTime.now();
-//        LocalTime from = now.minusHours(1);
-//        LocalTime to = now.plusHours(1);
-//
-//        mockMvc.perform(post("/reserve")
-//                        .param("resourceId", String.valueOf(resourceId))
-//                        .param("date", LocalDate.now().toString())
-//                        .param("from", String.valueOf(from))
-//                        .param("to", String.valueOf(to))
-//                        .with(user(userDetails))
-//                )
-//                .andExpect(status().isOk())
-//                .andExpect(view().name("resource-detail"))
-//                .andExpect(content().string(containsString("text-danger")));
-//    }
+    @Test
+    public void shouldFailToReserveDueToReservationPeriodBeingInThePast() throws Exception {
+        LocalTime now = LocalTime.now(fixedClock);
+        LocalTime from = now.minusHours(1);
+        LocalTime to = now.plusHours(1);
+
+        System.out.println(now);
+        System.out.println(from + " : " + to);
+        System.out.println(LocalDate.now());
+
+        mockMvc.perform(post("/reserve")
+                        .param("resourceId", String.valueOf(resourceId))
+                        .param("date", LocalDate.now().toString())
+                        .param("from", String.valueOf(from))
+                        .param("to", String.valueOf(to))
+                        .with(user(userDetails))
+                )
+                .andExpect(status().isOk())
+                .andExpect(view().name("resource-detail"))
+                .andExpect(content().string(containsString("text-danger")));
+    }
 
     @Test
     public void shouldFailToReserveDueToFromBeingLaterThanTo() throws Exception {

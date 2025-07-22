@@ -7,11 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Service
 public class ReservationService {
+
+    private final Clock clock;
+
+    public ReservationService(Clock clock) {
+        this.clock = clock;
+    }
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -42,7 +49,7 @@ public class ReservationService {
     }
 
     public boolean timePeriodIsNotInThePast(LocalTime to, LocalTime from) {
-        return LocalTime.now().isBefore(from);
+        return LocalTime.now(clock).isBefore(from);
     }
 
     public boolean timePeriodIsCorrectAndNotNull(LocalTime to, LocalTime from) {
@@ -55,10 +62,10 @@ public class ReservationService {
 
     public BindingResult reserve(ReservationDto reservationDto, BindingResult result) {
 
-//        if (timePeriodIsNotInThePast(reservationDto.getTo(), reservationDto.getFrom())) {
-//            result.rejectValue("from", "error.from", "Resource reservation period is in the past!");
-//            return result;
-//        }
+        if (!timePeriodIsNotInThePast(reservationDto.getTo(), reservationDto.getFrom())) {
+            result.rejectValue("from", "error.from", "Resource reservation period is in the past!");
+            return result;
+        }
 
         if (!timePeriodIsCorrectAndNotNull(reservationDto.getTo(), reservationDto.getFrom())) {
             result.rejectValue("from", "error.from", "Resource reservation period is invalid!");
