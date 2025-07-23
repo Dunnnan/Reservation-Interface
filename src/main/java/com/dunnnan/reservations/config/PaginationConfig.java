@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "pagination")
 public class PaginationConfig {
-    private int defaultPageSize = 3;
+    private int defaultPageSize = 2;
     private int maxPageSize = 20;
 
     public int getDefaultPageSize() {

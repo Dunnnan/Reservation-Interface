@@ -16,12 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -66,11 +65,28 @@ public class ResourceService {
         return resourceRepository.findByTypeInAndNameContainingIgnoreCase(page, types, search);
     }
 
+    public Set<String> getValidFields(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .map(Field::getName)
+                .collect(Collectors.toSet());
+    }
+
+    public boolean isCorrectSortDirection(String sortDirection) {
+        return sortDirection.equalsIgnoreCase("asc") || sortDirection.equalsIgnoreCase("desc");
+    }
+
     public Sort getSort(String sortDirection, String sortField) {
+        Set<String> validSortFields = getValidFields(Resource.class);
+
+        // Check sortField for invalid data
+        sortField = (sortField == null || sortField.isEmpty() || !validSortFields.contains(sortField)) ? "id" : sortField;
+
+        // Check sortDirection for invalid data
+        sortDirection = (sortDirection == null || sortDirection.isEmpty() || !isCorrectSortDirection(sortDirection)) ? "asc" : sortDirection;
+
         return Sort.by(
-                Sort.Direction.fromString(sortDirection == null ||
-                        sortDirection.isEmpty() ? "asc" : sortDirection),
-                sortField == null || sortField.isEmpty() ? "id" : sortField
+                Sort.Direction.fromString(sortDirection),
+                sortField
         );
     }
 
@@ -107,6 +123,8 @@ public class ResourceService {
 
         // Handle Page parameter
         int currentPage = page.orElse(0);
+        currentPage = Math.max(currentPage, 0);
+        currentPage = Math.min(currentPage, totalPages - 1);
 
         // Handle navigation parameters
         int startPage = 0;
@@ -134,6 +152,18 @@ public class ResourceService {
         // Handle Page parameters
         Sort sort = getSort(sortDirection, sortField);
         Pageable pageable = getPageable(page, size, sort);
+        Page<Resource> resourcePage = getResourcePage(pageable, types, search);
+
+        // Handle edge cases
+        int requestedPage = page.orElse(0);
+        int totalPages = resourcePage.getTotalPages();
+        if (requestedPage > totalPages - 1) {
+            pageable = getPageable(Optional.of(totalPages - 1), size, sort);
+            return getResourcePage(pageable, types, search);
+        } else if (requestedPage < 0) {
+            pageable = getPageable(Optional.of(0), size, sort);
+            return getResourcePage(pageable, types, search);
+        }
 
         return getResourcePage(pageable, types, search);
     }
