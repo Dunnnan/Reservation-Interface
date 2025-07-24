@@ -1,5 +1,6 @@
 package com.dunnnan.reservations.service;
 
+import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +16,12 @@ import static com.dunnnan.reservations.constants.StorageConstants.RESOURCE_IMAGE
 public class FileStorageService {
 
     private static final Path storageFolder = Paths.get(RESOURCE_IMAGE_PATH).toAbsolutePath();
+
+    public boolean isImage(MultipartFile file) throws IOException {
+        Tika tika = new Tika();
+        String mimeType = tika.detect(file.getInputStream());
+        return mimeType.startsWith("image/");
+    }
 
     public String saveImage(MultipartFile file) throws IOException {
 

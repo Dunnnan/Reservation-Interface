@@ -13,7 +13,7 @@ Feature: Registration
 
   Scenario: Account with the inputted email already exists
     Given the email is already registered
-    When uóser enters name, surname, email, phoneNumber, password, confirmPassword
+    When user enters name, surname, email, phoneNumber, password, confirmPassword
     And clicks Register button
     Then he should see register failure message with annotation about incorrect email
 

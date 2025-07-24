@@ -6,21 +6,18 @@ import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
 import com.dunnnan.reservations.model.dto.ResourceDto;
 import com.dunnnan.reservations.repository.ResourceRepository;
-import org.apache.tika.Tika;
+import com.dunnnan.reservations.validation.ResourceValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -40,6 +37,9 @@ public class ResourceService {
 
     @Autowired
     private AvailabilityService availabilityService;
+
+    @Autowired
+    private ResourceValidator resourceValidator;
 
     public List<Resource> getAllResources() {
         return resourceRepository.findAll();
@@ -65,24 +65,9 @@ public class ResourceService {
         return resourceRepository.findByTypeInAndNameContainingIgnoreCase(page, types, search);
     }
 
-    public Set<String> getValidFields(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
-                .map(Field::getName)
-                .collect(Collectors.toSet());
-    }
-
-    public boolean isCorrectSortDirection(String sortDirection) {
-        return sortDirection.equalsIgnoreCase("asc") || sortDirection.equalsIgnoreCase("desc");
-    }
-
     public Sort getSort(String sortDirection, String sortField) {
-        Set<String> validSortFields = getValidFields(Resource.class);
-
-        // Check sortField for invalid data
-        sortField = (sortField == null || sortField.isEmpty() || !validSortFields.contains(sortField)) ? "id" : sortField;
-
-        // Check sortDirection for invalid data
-        sortDirection = (sortDirection == null || sortDirection.isEmpty() || !isCorrectSortDirection(sortDirection)) ? "asc" : sortDirection;
+        sortField = resourceValidator.validateSortField(sortField);
+        sortDirection = resourceValidator.validateSortDirection(sortDirection);
 
         return Sort.by(
                 Sort.Direction.fromString(sortDirection),
@@ -90,29 +75,28 @@ public class ResourceService {
         );
     }
 
-    public Pageable getPageable(Optional<Integer> page, Optional<Integer> size, Sort sort) {
-        int currentPage = page.orElse(0);
-        int pageSize = size.orElse(paginationConfig.getDefaultPageSize());
-
-        return PageRequest.of(currentPage, pageSize, sort);
+    public Pageable getPageable(int page, int size, Sort sort) {
+        return PageRequest.of(page, size, sort);
     }
 
     public Page<Resource> getResourcePage(Pageable pageable, Optional<List<String>> types, Optional<String> search) {
+        List<String> resourceTypes = resourceValidator.validateTypesField(types.orElse(new ArrayList<>()));
+
         // All
-        if (types.isEmpty() && search.isEmpty()) {
+        if (resourceTypes.isEmpty() && search.isEmpty()) {
             return getAllResources(pageable);
         }
         // Search
-        else if (types.isEmpty()) {
+        else if (resourceTypes.isEmpty()) {
             return getResourcesByName(pageable, search.get());
         }
         // Filter
         else if (search.isEmpty()) {
-            return getResourcesByTypeIn(pageable, types.get());
+            return getResourcesByTypeIn(pageable, resourceTypes);
         }
         // Search & Filter
         else {
-            return getResourcesByTypeAndName(pageable, types.get(), search.get());
+            return getResourcesByTypeAndName(pageable, resourceTypes, search.get());
         }
     }
 
@@ -122,8 +106,7 @@ public class ResourceService {
     ) {
 
         // Handle Page parameter
-        int currentPage = page.orElse(0);
-        currentPage = Math.max(currentPage, 0);
+        int currentPage = page.filter(p -> p >= 0).orElse(0);
         currentPage = Math.min(currentPage, totalPages - 1);
 
         // Handle navigation parameters
@@ -149,33 +132,27 @@ public class ResourceService {
             Optional<List<String>> types,
             Optional<String> search
     ) {
+
+        int requestedPage = page.filter(p -> p >= 0).orElse(0);
+        int requestedSize = size.orElse(paginationConfig.getDefaultPageSize());
+
         // Handle Page parameters
         Sort sort = getSort(sortDirection, sortField);
-        Pageable pageable = getPageable(page, size, sort);
+        Pageable pageable = getPageable(requestedPage, requestedSize, sort);
         Page<Resource> resourcePage = getResourcePage(pageable, types, search);
 
         // Handle edge cases
-        int requestedPage = page.orElse(0);
         int totalPages = resourcePage.getTotalPages();
         if (requestedPage > totalPages - 1) {
-            pageable = getPageable(Optional.of(totalPages - 1), size, sort);
-            return getResourcePage(pageable, types, search);
-        } else if (requestedPage < 0) {
-            pageable = getPageable(Optional.of(0), size, sort);
+            pageable = getPageable(totalPages - 1, requestedSize, sort);
             return getResourcePage(pageable, types, search);
         }
 
-        return getResourcePage(pageable, types, search);
+        return resourcePage;
     }
 
     public String reverseDirection(String direction) {
         return "asc".equalsIgnoreCase(direction) ? "desc" : "asc";
-    }
-
-    public boolean isImage(MultipartFile file) throws IOException {
-        Tika tika = new Tika();
-        String mimeType = tika.detect(file.getInputStream());
-        return mimeType.startsWith("image/");
     }
 
     public void addResource(ResourceDto resourceDto) throws IOException {

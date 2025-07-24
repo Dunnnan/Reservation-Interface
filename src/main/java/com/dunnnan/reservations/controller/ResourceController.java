@@ -5,6 +5,7 @@ import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
 import com.dunnnan.reservations.model.dto.ReservationDto;
 import com.dunnnan.reservations.model.dto.ResourceDto;
+import com.dunnnan.reservations.service.FileStorageService;
 import com.dunnnan.reservations.service.ReservationService;
 import com.dunnnan.reservations.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class ResourceController {
     @Autowired
     private PaginationConfig paginationConfig;
 
+    @Autowired
+    private FileStorageService fileStorageService;
+
     @GetMapping("/home")
     public String home(
             Model model,
@@ -44,7 +48,7 @@ public class ResourceController {
     ) {
 
         // Load Resource Page
-        Page<Resource> resourcePage = resourceService.loadResourcePage(
+        Page<Resource> resourcePage = resourceService.  loadResourcePage(
                 sortField, sortDirection, page, size, types, search);
 
         // Load Page Navigation parameters
@@ -91,7 +95,7 @@ public class ResourceController {
     ) throws IOException {
 
         // Validate sent image (if it's an image)
-        if (!resourceService.isImage(resource.getImage())) {
+        if (!fileStorageService.isImage(resource.getImage())) {
             result.rejectValue("image", "error.image", "File is not an image");
         }
 
