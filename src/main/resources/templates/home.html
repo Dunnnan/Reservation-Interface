@@ -62,10 +62,13 @@
             <div class="col-md-6">
                 <form role="search">
                     <!--Other-->
-                    <input type="hidden" name="sortField" th:value="${sortField}"/>
-                    <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
+                    <input type="hidden" name="sortField" th:value="${sortField}"
+                           th:if="${sortField != null and !#strings.isEmpty(sortField)}"/>
+                    <input type="hidden" name="sortDirection" th:value="${sortDirection}"
+                           th:if="${sortDirection != null and !#strings.isEmpty(sortDirection)}"/>
                     <div th:each="type : ${types}">
-                        <input type="hidden" name="types" th:value="${type}"/>
+                        <input type="hidden" name="types" th:value="${type}"
+                               th:if="${type != null and !#strings.isEmpty(type)}"/>
                     </div>
 
                     <div class="input-group">
@@ -188,9 +191,12 @@
                     <h5>Filters</h5>
                     <form method="get" th:action="@{home}">
                         <!--Other-->
-                        <input type="hidden" name="sortField" th:value="${sortField}"/>
-                        <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
-                        <input type="hidden" name="search" th:value="${search}"/>
+                        <input type="hidden" name="sortField" th:value="${sortField}"
+                               th:if="${sortField != null and !#strings.isEmpty(sortField)}"/>
+                        <input type="hidden" name="sortDirection" th:value="${sortDirection}"
+                               th:if="${sortDirection != null and !#strings.isEmpty(sortDirection)}"/>
+                        <input type="hidden" name="search" th:value="${search}"
+                               th:if="${search != null and !#strings.isEmpty(search)}"/>
 
                         <div class="mb-2">
                             <label class="form-label">Type</label>
@@ -220,16 +226,26 @@
                     Sort by:<br>
                 </strong>
 
-                <form method="get" th:action="@{/home}">
+                <form method="get" th:action="@{/home}" id="sortForm">
 
                     <!--Other-->
-                    <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
+                    <input type="hidden" name="sortDirection" th:value="${sortDirection}"
+                           id="sortDirectionInput"/>
                     <div th:each="type : ${types}">
-                        <input type="hidden" name="types" th:value="${type}"/>
+                        <input type="hidden" name="types" th:value="${type}"
+                               th:if="${type != null and !#strings.isEmpty(type)}"/>
                     </div>
-                    <input type="hidden" name="search" th:value="${search}"/>
+                    <input type="hidden" name="search" th:value="${search}"
+                           th:if="${search != null and !#strings.isEmpty(search)}"/>
 
-                    <div class="btn-group" role="group" aria-label="Sort buttons">
+                    <div class="btn-group me-2" role="group" aria-label="Sort buttons">
+                        <!-- Reset sortField -->
+                        <input type="radio" class="btn-check" name="sortField" id="sortNone" value=""
+                               th:checked="${#strings.isEmpty(sortField)}" onchange="this.form.submit()">
+                        <label class="btn btn-outline-secondary" for="sortNone">
+                            X
+                        </label>
+
                         <input type="radio" class="btn-check" name="sortField" id="sortName" value="name"
                                th:checked="${sortField == 'name'}" onchange="this.form.submit()">
                         <label class="btn btn-outline-primary" for="sortName">Name</label>
@@ -237,6 +253,13 @@
                         <input type="radio" class="btn-check" name="sortField" id="sortType" value="type"
                                th:checked="${sortField == 'type'}" onchange="this.form.submit()">
                         <label class="btn btn-outline-primary" for="sortType">Type</label>
+                    </div>
+
+                    <div class="btn-group" role="group" aria-label="Sort direction">
+                        <button type="button" class="btn btn-outline-secondary"
+                                onclick="toggleSortDirectionAndSubmit()">
+                            <span th:text="${sortDirection == 'asc' ? '↑ Asc' : '↓ Desc'}"></span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -285,12 +308,14 @@
 <form method="get" th:action="@{/home}">
 
     <!--Other-->
-    <input type="hidden" name="sortField" th:value="${sortField}"/>
-    <input type="hidden" name="sortDirection" th:value="${sortDirection}"/>
+    <input type="hidden" name="sortField" th:value="${sortField}"
+           th:if="${sortField != null and !#strings.isEmpty(sortField)}"/>
+    <input type="hidden" name="sortDirection" th:value="${sortDirection}"
+           th:if="${sortDirection != null and !#strings.isEmpty(sortDirection)}"/>
     <div th:each="type : ${types}">
-        <input type="hidden" name="types" th:value="${type}"/>
+        <input type="hidden" name="types" th:value="${type}" th:if="${type != null and !#strings.isEmpty(type)}"/>
     </div>
-    <input type="hidden" name="search" th:value="${search}"/>
+    <input type="hidden" name="search" th:value="${search}" th:if="${search != null and !#strings.isEmpty(search)}"/>
 
     <!--Page-->
     <nav class="d-flex justify-content-center">
@@ -331,6 +356,12 @@
         });
     }
     /*]]>*/
+
+    function toggleSortDirectionAndSubmit() {
+        const input = document.getElementById('sortDirectionInput');
+        input.value = input.value === 'asc' ? 'desc' : 'asc';
+        document.getElementById('sortForm').submit();
+    }
 </script>
 </body>
 </html>

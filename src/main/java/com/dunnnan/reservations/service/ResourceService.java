@@ -134,7 +134,7 @@ public class ResourceService {
     ) {
 
         int requestedPage = page.filter(p -> p >= 0).orElse(0);
-        int requestedSize = size.orElse(paginationConfig.getDefaultPageSize());
+        int requestedSize = Math.min(size.orElse(paginationConfig.getDefaultPageSize()), paginationConfig.getMaxPageSize());
 
         // Handle Page parameters
         Sort sort = getSort(sortDirection, sortField);
@@ -142,17 +142,13 @@ public class ResourceService {
         Page<Resource> resourcePage = getResourcePage(pageable, types, search);
 
         // Handle edge cases
-        int totalPages = resourcePage.getTotalPages();
-        if (requestedPage > totalPages - 1) {
-            pageable = getPageable(totalPages - 1, requestedSize, sort);
+        int totalPages = Math.max(resourcePage.getTotalPages() - 1, 0);
+        if (requestedPage > totalPages) {
+            pageable = getPageable(totalPages, requestedSize, sort);
             return getResourcePage(pageable, types, search);
         }
 
         return resourcePage;
-    }
-
-    public String reverseDirection(String direction) {
-        return "asc".equalsIgnoreCase(direction) ? "desc" : "asc";
     }
 
     public void addResource(ResourceDto resourceDto) throws IOException {

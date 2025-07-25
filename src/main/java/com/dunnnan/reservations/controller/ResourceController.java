@@ -43,12 +43,11 @@ public class ResourceController {
             @RequestParam(name = "page") Optional<Integer> page,
             @RequestParam(name = "size") Optional<Integer> size,
             @RequestParam(name = "types") Optional<List<String>> types,
-            @RequestParam(name = "search") Optional<String> search,
-            @RequestParam(name = "typeOptions") Optional<List<String>> typeOptions
+            @RequestParam(name = "search") Optional<String> search
     ) {
 
         // Load Resource Page
-        Page<Resource> resourcePage = resourceService.  loadResourcePage(
+        Page<Resource> resourcePage = resourceService.loadResourcePage(
                 sortField, sortDirection, page, size, types, search);
 
         // Load Page Navigation parameters
@@ -65,7 +64,6 @@ public class ResourceController {
         // Sort
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
-        model.addAttribute("reverseSortDirection", resourceService.reverseDirection(sortDirection));
 
         // Filter
         model.addAttribute("types", types.orElse(Collections.emptyList()));
