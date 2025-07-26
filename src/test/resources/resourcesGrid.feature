@@ -32,7 +32,7 @@ Feature: Resources Grid
   Scenario: Employee opens the add resource form
     Given User is authenticated as an Employee
     And User is at the home page
-    When User clicks the "Add" button
+    When User clicks the "Add Resource" button
     Then The add resource pop-up should appear
 
   Scenario: Employee submits the add resource form
