@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.w3.org/1999/xhtml"
+      lang="en"
+      data-bs-theme="dark">
+<head>
+    <title>My Reservations</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style></style>
+</head>
+
+<body class="min-vh-100 justify-content-center align-items-center">
+<div class="container py-5">
+
+    <!--Webpage navigation bar-->
+    <nav class="navbar navbar-expand-md bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="http://localhost:8080/home">Reservations</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://localhost:8080/home">
+                            Home
+                            <span class="sr-only"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">My Reservations</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('EMPLOYEE')">
+                        <a class="nav-link" href="#">Administration</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('EMPLOYEE')">
+                        <a class="nav-link" href="#">Settings</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!--Filter-->
+    <div class="mt-4 p-3">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+                <div class="card shadow-sm border-primary-subtle">
+
+
+                    <h1>
+                        Soon there will be nice display of personal reservations of the User.
+                    </h1>
+                    <div class="card-body" th:object="${reservations}">
+                        <!--Date-->
+                        <!--From-->
+                        <!--To-->
+
+                        <!--Same display as during reserve?-->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
