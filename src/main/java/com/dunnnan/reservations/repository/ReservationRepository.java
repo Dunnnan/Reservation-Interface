@@ -5,11 +5,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.OffsetTime;
 import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     List<Reservation> findByDateAndResource_IdAndFromLessThanAndToGreaterThan(
             LocalDate date, Long id, LocalTime to, LocalTime from);
+
+    List<Reservation> findByDateAndResource_Id(
+            LocalDate date, Long id
+    );
 
 }

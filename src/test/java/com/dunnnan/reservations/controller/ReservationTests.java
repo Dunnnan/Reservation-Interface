@@ -109,10 +109,6 @@ public class ReservationTests {
         LocalTime from = now.minusHours(1);
         LocalTime to = now.plusHours(1);
 
-        System.out.println(now);
-        System.out.println(from + " : " + to);
-        System.out.println(LocalDate.now());
-
         mockMvc.perform(post("/reserve")
                         .param("resourceId", String.valueOf(resourceId))
                         .param("date", LocalDate.now().toString())
