@@ -127,8 +127,6 @@ public class ResourceController {
         if (resource.isPresent()) {
             model.addAttribute("resource", resource.get());
             model.addAttribute("reservation", new ReservationDto());
-//            model.addAttribute("validFromHours", reservationService.getValidFromHours());
-//            model.addAttribute("validToHours", reservationService.validToHours());
 
 //            LocalDate startDate = LocalDate.now().plusWeeks(weeksLater);
 //            List<LocalDate> weekDates = IntStream.range(0, 7)

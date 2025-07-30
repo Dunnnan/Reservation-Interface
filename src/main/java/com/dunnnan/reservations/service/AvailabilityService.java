@@ -27,7 +27,7 @@ public class AvailabilityService {
 
     public Availability getAvailabilityOfSpecificResourceForSpecificDay(Long id, LocalDate date) {
         return availabilityRepository.findByResource_IdAndDate(id, date).orElseThrow(() ->
-                new RuntimeException("Resource doesn't is not available for specified date."));
+                new RuntimeException("Resource is not available for specified date."));
     }
 
     public List<LocalTime> getAvailabilityTimePeriod(Long id, LocalDate date) {

@@ -6,6 +6,7 @@ import com.dunnnan.reservations.model.dto.ReservationDto;
 import com.dunnnan.reservations.repository.ReservationRepository;
 import com.dunnnan.reservations.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
@@ -48,6 +49,10 @@ public class ReservationService {
     }
 
     public boolean timePeriodIsNotInThePast(LocalTime to, LocalTime from, LocalDate date) {
+        System.out.println(LocalDate.now(clock));
+        System.out.println(LocalTime.now(clock));
+
+
         return LocalDate.now(clock).isBefore(date) || LocalTime.now(clock).isBefore(from);
     }
 

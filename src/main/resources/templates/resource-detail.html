@@ -71,7 +71,7 @@
                                 <div class="text-danger" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></div>
                             </div>
 
-                            <!--Form-->
+                            <!--From-->
                             <div class="mb-3">
                                 <label for="from" class="form-label">From</label>
                                 <select name="from" id="from" class="form-select" required disabled></select>
@@ -130,30 +130,33 @@
             const fromSelect = document.getElementById("from")
             const toSelect = document.getElementById("to")
 
-            fromSelect.innerHTML = "";
-            toSelect.innerHTML = "";
+            fromSelect.innerHTML = '';
+            toSelect.innerHTML = '';
+
 
             if (data.length > 0) {
                 data.forEach(period => {
                     const fromOption = document.createElement("option");
                     const toOption = document.createElement("option");
+
                     fromOption.value = period;
                     fromOption.textContent = period;
                     toOption.value = period;
                     toOption.textContent = period;
+
+                    fromSelect.disabled = false;
+                    toSelect.disabled = false;
+                    fromSelect.required = true;
+                    toSelect.required = true;
+
                     fromSelect.appendChild(fromOption);
                     toSelect.appendChild(toOption);
                 });
 
-                fromSelect.disabled = false;
-                toSelect.disabled = false;
-                fromSelect.required = true;
-                toSelect.required = true;
+
             } else {
-                fromSelect.disabled = true;
-                toSelect.disabled = true;
-                fromSelect.required = false;
-                toSelect.required = false;
+                fromSelect.innerHTML = '<option value="" selected hidden>Resource is not available for that date</option>';
+                toSelect.innerHTML = '<option value="" selected hidden>Resource is not available for that date</option>';
             }
 
         })
