@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,9 +66,7 @@ public class ReservationController {
             @RequestParam Long resourceId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        return reservationService.getValidReservationHours(resourceId, date).stream()
-                .map(LocalTime::toString)
-                .toList();
+        return reservationService.getValidReservationHours(resourceId, date);
     }
 
 }

@@ -5,30 +5,40 @@ import com.dunnnan.reservations.model.Reservation;
 import com.dunnnan.reservations.model.dto.ReservationDto;
 import com.dunnnan.reservations.repository.ReservationRepository;
 import com.dunnnan.reservations.util.TimeUtil;
+import com.dunnnan.reservations.validation.ReservationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservationService {
 
     private final Clock clock;
+
+    @Autowired
+    ReservationValidator reservationValidator;
+
     @Autowired
     private ReservationRepository reservationRepository;
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private ResourceService resourceService;
+
     @Autowired
     private AvailabilityService availabilityService;
+
     @Autowired
     private ReservationConstants reservationConstants;
 
@@ -37,31 +47,6 @@ public class ReservationService {
 
     public ReservationService(Clock clock) {
         this.clock = clock;
-    }
-
-    public List<Reservation> getAllReservationsByDateAndResourceId(Long id, LocalDate date) {
-        return reservationRepository.findByDateAndResource_Id(date, id);
-    }
-
-    public boolean isReservationPeriodFree(
-            LocalDate date, Long id, LocalTime from, LocalTime to) {
-        return reservationRepository.findByDateAndResource_IdAndFromLessThanAndToGreaterThan(date, id, to, from).isEmpty();
-    }
-
-    public boolean timePeriodIsNotInThePast(LocalTime to, LocalTime from, LocalDate date) {
-        System.out.println(LocalDate.now(clock));
-        System.out.println(LocalTime.now(clock));
-
-
-        return LocalDate.now(clock).isBefore(date) || LocalTime.now(clock).isBefore(from);
-    }
-
-    public boolean timePeriodIsCorrectAndNotNull(LocalTime to, LocalTime from) {
-        return from.isBefore(to);
-    }
-
-    public boolean resourceExists(Long id) {
-        return resourceService.getResourceById(id).isPresent();
     }
 
     public void registerReservation(ReservationDto reservationDto) {
@@ -76,66 +61,62 @@ public class ReservationService {
     }
 
     public BindingResult reserve(ReservationDto reservationDto, BindingResult result) {
-
-        if (!timePeriodIsNotInThePast(reservationDto.getTo(), reservationDto.getFrom(), reservationDto.getDate())) {
-            result.rejectValue("from", "error.from", "Resource reservation period is in the past!");
-            return result;
-        }
-
-        if (!timePeriodIsCorrectAndNotNull(reservationDto.getTo(), reservationDto.getFrom())) {
-            result.rejectValue("from", "error.from", "Resource reservation period is invalid!");
-            return result;
-        }
-
-        if (!resourceExists(reservationDto.getResourceId())) {
-            result.rejectValue("date", "error.date", "Resource doesn't exist!");
-            return result;
-        }
-
-        if (!availabilityService.isAvailable(reservationDto.getDate(), reservationDto.getResourceId())) {
-            result.rejectValue("date", "error.date", "Resource isn't available in that day!");
-            return result;
-        }
-
-        if (!isReservationPeriodFree(
-                reservationDto.getDate(),
-                reservationDto.getResourceId(),
-                reservationDto.getFrom(),
-                reservationDto.getTo()
-        )) {
-            result.rejectValue("from", "error.from", "Reservation period is already reserved!");
-            return result;
-        }
+        result = reservationValidator.validateReservation(reservationDto, result);
 
         registerReservation(reservationDto);
         return result;
     }
 
-    public List<LocalTime> getValidReservationHours(Long resourceId, LocalDate date) {
-        // Availability period of resource
+    public List<Reservation> getAllReservationsByDateAndResourceId(Long id, LocalDate date) {
+        return reservationRepository.findByDateAndResource_Id(date, id);
+    }
+
+    public Set<LocalTime> filterHoursByNeighbor(Set<LocalTime> hoursSet, Duration interval, boolean requireBothNeighbors) {
+        return hoursSet.stream()
+                .filter(hour -> {
+                    boolean hasPrev = hoursSet.contains(hour.minus(interval));
+                    boolean hasNext = hoursSet.contains(hour.plus(interval));
+                    return requireBothNeighbors ? (hasPrev && hasNext) : (hasPrev || hasNext);
+                })
+                .collect(Collectors.toSet());
+    }
+
+    public List<String> getValidReservationHours(Long resourceId, LocalDate date) {
+        Duration interval = reservationConstants.getReservationInterval();
+
+        // Get availability period of resource
         List<LocalTime> availability = availabilityService.getAvailabilityTimePeriod(resourceId, date);
         LocalTime openingTime = availability.get(0);
         LocalTime closingTime = availability.get(1);
 
-        // All reservations of resource
-        List<Reservation> reservations = getAllReservationsByDateAndResourceId(resourceId, date);
-        Set<LocalTime> occupiedHours = new HashSet<>();
+        // Specify occupied hours
+        Set<LocalTime> occupiedHours = getAllReservationsByDateAndResourceId(resourceId, date).stream()
+                .flatMap(reservation -> timeUtil.getAllPossibleReservationHours(
+                        reservation.getFrom(), reservation.getTo()).stream()
+                )
+                .collect(Collectors.toSet());
 
-        // Specifying occupied hours
-        for (Reservation reservation : reservations) {
-            List<LocalTime> reservationHours = timeUtil.getAllPossibleReservationHours(
-                    reservation.getFrom(), reservation.getTo());
-            occupiedHours.addAll(reservationHours);
-        }
+        // Remove hours that are not part of the reservation (beginning / end)
+        occupiedHours = filterHoursByNeighbor(occupiedHours, interval, true);
 
-        // Filtering occupied hours
+        // Get all hours possible hours and exclude occupied ones
         Set<LocalTime> validHours = new HashSet<>(timeUtil.getAllPossibleReservationHours(
                 openingTime, closingTime));
-
         validHours.removeAll(occupiedHours);
+
+        // Remove past hours (today)
+        if (LocalDate.now(clock).equals(date)) {
+            validHours = validHours.stream()
+                    .filter(hour -> hour.isAfter(LocalTime.now(clock)))
+                    .collect(Collectors.toSet());
+        }
+
+        // Remove isolated hours (have no neighbor)
+        validHours = filterHoursByNeighbor(validHours, interval, false);
 
         return validHours.stream()
                 .sorted()
+                .map(LocalTime::toString)
                 .toList();
     }
 

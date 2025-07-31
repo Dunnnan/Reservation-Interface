@@ -54,12 +54,12 @@
             <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
                 <div class="card shadow-sm border-primary-subtle">
 
-                    <h1 class="card-title">Reserve</h1>
-
-                    <!-- Global success message -->
-                    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+                    <h1 class="card-title text-center mt-3">Reserve</h1>
 
                     <div class="card-body">
+                        <!-- Global success message -->
+                        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
                         <form th:action="@{/reserve}" th:object="${reservation}" method="post">
                             <!--Resource ID-->
                             <input type="hidden" name="resourceId" th:value="${resource.id}">
@@ -69,6 +69,11 @@
                                 <label for="date" class="form-label">Date</label>
                                 <input type="date" class="form-control" id="date" name="date" required>
                                 <div class="text-danger" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></div>
+                            </div>
+
+                            <!--Warning message-->
+                            <div id="unavailableAlert" class="alert alert-warning" hidden>Resource is not available for
+                                that date
                             </div>
 
                             <!--From-->
@@ -129,10 +134,13 @@
         .then(data => {
             const fromSelect = document.getElementById("from")
             const toSelect = document.getElementById("to")
+            const warningInfo = document.getElementById("unavailableAlert")
 
             fromSelect.innerHTML = '';
             toSelect.innerHTML = '';
 
+            fromSelect.disabled = false;
+            toSelect.disabled = false;
 
             if (data.length > 0) {
                 data.forEach(period => {
@@ -144,19 +152,17 @@
                     toOption.value = period;
                     toOption.textContent = period;
 
-                    fromSelect.disabled = false;
-                    toSelect.disabled = false;
                     fromSelect.required = true;
                     toSelect.required = true;
+
+                    warningInfo.hidden = true;
 
                     fromSelect.appendChild(fromOption);
                     toSelect.appendChild(toOption);
                 });
 
-
             } else {
-                fromSelect.innerHTML = '<option value="" selected hidden>Resource is not available for that date</option>';
-                toSelect.innerHTML = '<option value="" selected hidden>Resource is not available for that date</option>';
+                warningInfo.hidden = false;
             }
 
         })
