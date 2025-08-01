@@ -63,6 +63,10 @@ public class ReservationService {
     public BindingResult reserve(ReservationDto reservationDto, BindingResult result) {
         result = reservationValidator.validateReservation(reservationDto, result);
 
+        if (result.hasErrors()) {
+            return result;
+        }
+
         registerReservation(reservationDto);
         return result;
     }

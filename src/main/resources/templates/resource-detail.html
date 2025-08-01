@@ -71,9 +71,14 @@
                                 <div class="text-danger" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></div>
                             </div>
 
-                            <!--Warning message-->
-                            <div id="unavailableAlert" class="alert alert-warning" hidden>Resource is not available for
-                                that date
+                            <!--Warning message - resource unavailable-->
+                            <div id="unavailableAlert" class="alert alert-warning" hidden>
+                                Resource is not available for that date.
+                            </div>
+
+                            <!--Warning message - invalid reservation period-->
+                            <div id="invalidPeriodAlert" class="alert alert-warning" hidden>
+                                Resource is not available for picked time period.
                             </div>
 
                             <!--From-->
@@ -123,50 +128,91 @@
 </div>
 
 <script>
+    <!--Event listener for date field-->
+    let allAvailableHours = [];
+
     document.getElementById("date").addEventListener("change", function () {
-    const selectedDate = this.value
-    const resourceId = document.getElementsByName("resourceId")[0]?.value;
+        const selectedDate = this.value
+        const resourceId = document.getElementsByName("resourceId")[0]?.value;
 
-    if (!selectedDate || !resourceId) return;
+        if (!selectedDate || !resourceId) return;
 
-    fetch(`/reservations/availableHours?resourceId=${resourceId}&date=${selectedDate}`)
-        .then(response => response.json())
-        .then(data => {
-            const fromSelect = document.getElementById("from")
-            const toSelect = document.getElementById("to")
-            const warningInfo = document.getElementById("unavailableAlert")
+        fetch(`/reservations/availableHours?resourceId=${resourceId}&date=${selectedDate}`)
+            .then(response => response.json())
+            .then(data => {
+                const fromSelect = document.getElementById("from")
+                const toSelect = document.getElementById("to")
 
-            fromSelect.innerHTML = '';
-            toSelect.innerHTML = '';
+                const warningInfo = document.getElementById("unavailableAlert")
+                const invalidPeriodAlert = document.getElementById("invalidPeriodAlert")
 
-            fromSelect.disabled = false;
-            toSelect.disabled = false;
+                fromSelect.innerHTML = '';
+                toSelect.innerHTML = '';
 
-            if (data.length > 0) {
-                data.forEach(period => {
-                    const fromOption = document.createElement("option");
-                    const toOption = document.createElement("option");
+                fromSelect.disabled = false;
+                toSelect.disabled = false;
+                fromSelect.required = true;
+                toSelect.required = true;
+                invalidPeriodAlert.hidden = true;
 
-                    fromOption.value = period;
-                    fromOption.textContent = period;
-                    toOption.value = period;
-                    toOption.textContent = period;
+                if (data.length > 0) {
+                    allAvailableHours = data;
 
-                    fromSelect.required = true;
-                    toSelect.required = true;
+                    data.forEach(period => {
+                        const fromOption = document.createElement("option");
+                        const toOption = document.createElement("option");
+
+                        fromOption.value = period;
+                        fromOption.textContent = period;
+                        toOption.value = period;
+                        toOption.textContent = period;
+
+                        fromSelect.appendChild(fromOption);
+                        toSelect.appendChild(toOption);
+                    });
 
                     warningInfo.hidden = true;
 
-                    fromSelect.appendChild(fromOption);
-                    toSelect.appendChild(toOption);
-                });
-
-            } else {
-                warningInfo.hidden = false;
-            }
-
-        })
+                } else {
+                    warningInfo.hidden = false;
+                }
+            })
     });
+
+    <!--Event listener for from field-->
+    document.getElementById("from").addEventListener("change", function () {
+        const selectedForm = this.value;
+        const toSelect = document.getElementById("to");
+
+        const filtered = allAvailableHours.filter(hour => hour > selectedForm);
+        updateSelect(toSelect, filtered);
+    })
+
+<!--    &lt;!&ndash;Event listener for to field&ndash;&gt;-->
+<!--    document.getElementById("to").addEventListener("change", function () {-->
+<!--        const selectedForm = this.value;-->
+<!--        const fromSelect = document.getElementById("from");-->
+
+<!--        const filtered = allAvailableHours.filter(hour => hour < selectedForm);-->
+<!--        updateSelect(fromSelect, filtered);-->
+<!--    })-->
+
+    <!--Function for dynamic populating selects-->
+    function updateSelect(selectElement, options) {
+        selectElement.innerHTML = '';
+        options.forEach(hour => {
+            const option = document.createElement("option");
+            option.value = hour;
+            option.textContent = hour;
+            selectElement.appendChild(option);
+        })
+
+        if (options.length == 0) {
+            invalidPeriodAlert.hidden = false
+        } else {
+            invalidPeriodAlert.hidden = true
+        }
+    }
 </script>
 
 
