@@ -63,10 +63,18 @@ public class ReservationController {
     @GetMapping("/reservations/availableHours")
     @ResponseBody
     public List<String> getAvailableHours(
+            @RequestParam String period,
             @RequestParam Long resourceId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        return reservationService.getValidReservationHours(resourceId, date);
+        return reservationService.getValidReservationHoursForDay(resourceId, date);
+
+//        if (period.equalsIgnoreCase("day")) {
+//            return reservationService.getValidReservationHoursForDay(resourceId, date);
+//        }
+//        else if (period.equalsIgnoreCase("week")) {
+//            return reservationService.getValidReservationHoursForWeek(resourceId, date);
+//        }
     }
 
 }

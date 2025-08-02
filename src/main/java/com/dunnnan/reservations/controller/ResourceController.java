@@ -62,6 +62,7 @@ public class ResourceController {
         model.addAttribute("totalElements", resourcePage.getTotalElements());
 
         // Sort
+//        model.addAttribute("sortOptions", resourceService.getSortOptions());
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
 

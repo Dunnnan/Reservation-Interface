@@ -10,14 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
-import java.time.Clock;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class ReservationService {
@@ -85,7 +82,7 @@ public class ReservationService {
                 .collect(Collectors.toSet());
     }
 
-    public List<String> getValidReservationHours(Long resourceId, LocalDate date) {
+    public List<String> getValidReservationHoursForDay(Long resourceId, LocalDate date) {
         Duration interval = reservationConstants.getReservationInterval();
 
         // Get availability period of resource
@@ -122,6 +119,21 @@ public class ReservationService {
                 .sorted()
                 .map(LocalTime::toString)
                 .toList();
+    }
+
+    public Map<Integer, List<String>> getValidReservationHoursForWeek(Long resourceId, LocalDate date) {
+        Map<Integer, List<String>> availableHoursForWeek = new HashMap<>();
+
+        LocalDate monday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+        return IntStream.range(0, 7)
+                .mapToObj(monday::plusDays)
+                .collect(Collectors.toMap(
+                        day -> day.getDayOfWeek().getValue(),
+                        day -> getValidReservationHoursForDay(resourceId, day),
+                        (a, b) -> b,
+                        LinkedHashMap::new
+                ));
     }
 
 }

@@ -28,6 +28,8 @@ public class ResourceTests {
     private static final String RESOURCE_URL_FRAGMENT = "/resource/";
     private static final String HOME_URL_FRAGMENT = "/home";
 
+    private static final String SEARCH_PHRASE = "Larry";
+
     private WebDriver webDriver;
     private WebDriverWait webDriverWait;
 
@@ -88,7 +90,7 @@ public class ResourceTests {
 
     @When("User enters a search phrase into the search bar")
     public void user_enters_search_phrase() {
-        webDriver.findElement(By.name("search")).sendKeys("example search phrase");
+        webDriver.findElement(By.name("search")).sendKeys(SEARCH_PHRASE);
     }
 
     @When("User submits the search")

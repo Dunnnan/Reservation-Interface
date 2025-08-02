@@ -65,6 +65,10 @@ public class ResourceService {
         return resourceRepository.findByTypeInAndNameContainingIgnoreCase(page, types, search);
     }
 
+//    public List<String> getSortOptions() {
+//        return reservationConstants.getSortOptions();
+//    }
+
     public Sort getSort(String sortDirection, String sortField) {
         sortField = resourceValidator.validateSortField(sortField);
         sortDirection = resourceValidator.validateSortDirection(sortDirection);
