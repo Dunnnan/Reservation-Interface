@@ -129,6 +129,25 @@ public class ResourceController {
             model.addAttribute("resource", resource.get());
             model.addAttribute("reservation", new ReservationDto());
 
+            // Calendar properties
+
+//            GetWeeksIntoTheFutureNumber(0-N);
+//            GetAllPossibleHoursForWeek; :
+//                      (Map
+//                          <Day(String)>
+//                          <List
+//                              <List<AllPossibleHours(String)>>
+//                              <List<AllPossibleHoursStatus(String)
+//                                  {
+//                                   Available,
+//                                   Reserved,
+//                                   Unavailable
+//                                   }
+//                             >
+//                          >
+//                       )
+
+
 //            LocalDate startDate = LocalDate.now().plusWeeks(weeksLater);
 //            List<LocalDate> weekDates = IntStream.range(0, 7)
 //                    .mapToObj(startDate::plusDays)
