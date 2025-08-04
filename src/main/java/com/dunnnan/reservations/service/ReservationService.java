@@ -82,6 +82,14 @@ public class ReservationService {
                 .collect(Collectors.toSet());
     }
 
+    public Set<LocalTime> getOccupiedHoursDuringTheDay(Long resourceId, LocalDate date) {
+        return getAllReservationsByDateAndResourceId(resourceId, date).stream()
+                .flatMap(reservation -> timeUtil.getAllPossibleReservationHours(
+                        reservation.getFrom(), reservation.getTo()).stream()
+                )
+                .collect(Collectors.toSet());
+    }
+
     public List<String> getValidReservationHoursForDay(Long resourceId, LocalDate date) {
         Duration interval = reservationConstants.getReservationInterval();
 
@@ -91,11 +99,7 @@ public class ReservationService {
         LocalTime closingTime = availability.get(1);
 
         // Specify occupied hours
-        Set<LocalTime> occupiedHours = getAllReservationsByDateAndResourceId(resourceId, date).stream()
-                .flatMap(reservation -> timeUtil.getAllPossibleReservationHours(
-                        reservation.getFrom(), reservation.getTo()).stream()
-                )
-                .collect(Collectors.toSet());
+        Set<LocalTime> occupiedHours = getOccupiedHoursDuringTheDay(resourceId, date);
 
         // Remove hours that are not part of the reservation (beginning / end)
         occupiedHours = filterHoursByNeighbor(occupiedHours, interval, true);
@@ -121,19 +125,50 @@ public class ReservationService {
                 .toList();
     }
 
-    public Map<Integer, List<String>> getValidReservationHoursForWeek(Long resourceId, LocalDate date) {
-        Map<Integer, List<String>> availableHoursForWeek = new HashMap<>();
+    public List<List<String>> getAllPossibleReservationHoursWithStatus(Long resourceId, LocalDate date) {
+        Duration interval = reservationConstants.getReservationInterval();
 
-        LocalDate monday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        // Get availability period of resource
+        List<LocalTime> availability = availabilityService.getAvailabilityTimePeriod(resourceId, date);
+        LocalTime openingTime = availability.get(0);
+        LocalTime closingTime = availability.get(1);
+
+        List<LocalTime> allPossibleHours = timeUtil.getAllPossibleReservationHours(openingTime, closingTime);
+
+        // Specify occupied hours
+        Set<LocalTime> occupiedHours = getOccupiedHoursDuringTheDay(resourceId, date);
+
+        List<String> hourLabels = new ArrayList<>();
+        List<String> hourStatuses = new ArrayList<>();
+
+        for (LocalTime hour : allPossibleHours) {
+
+            hourLabels.add(hour.toString());
+
+            if (occupiedHours.contains(hour)) {
+                hourStatuses.add("Reserved");
+            } else {
+                hourStatuses.add("Available");
+            }
+        }
+
+        return List.of(hourLabels, hourStatuses);
+    }
+
+    public Map<String, List<List<String>>> getReservationCalendar(Long resourceId, Integer weeksLater) {
+        LocalDate monday = LocalDate.now(clock)
+                .plusWeeks(weeksLater)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 
         return IntStream.range(0, 7)
                 .mapToObj(monday::plusDays)
                 .collect(Collectors.toMap(
-                        day -> day.getDayOfWeek().getValue(),
-                        day -> getValidReservationHoursForDay(resourceId, day),
+                        day -> day.getDayOfWeek().toString(),
+                        day -> getAllPossibleReservationHoursWithStatus(resourceId, day),
                         (a, b) -> b,
                         LinkedHashMap::new
                 ));
     }
+
 
 }

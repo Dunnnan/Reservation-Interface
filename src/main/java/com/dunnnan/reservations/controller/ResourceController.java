@@ -121,7 +121,7 @@ public class ResourceController {
     @GetMapping("/resource/{id}")
     public String resource(
             @PathVariable("id") Long id,
-            @RequestParam(defaultValue = "0") short weeksLater,
+            @RequestParam(defaultValue = "0") int weeksLater,
             Model model
     ) {
         Optional<Resource> resource = resourceService.getResourceById(id);
@@ -129,36 +129,13 @@ public class ResourceController {
             model.addAttribute("resource", resource.get());
             model.addAttribute("reservation", new ReservationDto());
 
-            // Calendar properties
-
-//            GetWeeksIntoTheFutureNumber(0-N);
-//            GetAllPossibleHoursForWeek; :
-//                      (Map
-//                          <Day(String)>
-//                          <List
-//                              <List<AllPossibleHours(String)>>
-//                              <List<AllPossibleHoursStatus(String)
-//                                  {
-//                                   Available,
-//                                   Reserved,
-//                                   Unavailable
-//                                   }
-//                             >
-//                          >
-//                       )
-
-
-//            LocalDate startDate = LocalDate.now().plusWeeks(weeksLater);
-//            List<LocalDate> weekDates = IntStream.range(0, 7)
-//                    .mapToObj(startDate::plusDays)
-//                    .toList();
-//            Map<LocalDate, List<LocalTime>> reserved = new HashMap<>();
-//            Map<LocalDate, List<LocalTime>> available = new HashMap<>();
-//
-//            for (LocalDate day : weekDates) {
-//                reserved.put(day, reservationService.getReservationsHoursForSpecificResourceAndDate(id, startDate));
-//                available.put(availabilityService.getAvailability(id, startDate));
-//            }
+            try {
+                model.addAttribute("calendarData", reservationService.getReservationCalendar(id, weeksLater));
+                model.addAttribute("calendarError", false);
+                System.out.println(reservationService.getReservationCalendar(id, weeksLater));
+            } catch (Exception e) {
+                model.addAttribute("calendarError", true);
+            }
 
             return "resource-detail";
         }

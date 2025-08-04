@@ -149,34 +149,40 @@
 
         <!--Calendar Grid-->
         <div class="container py-5">
-            <div class="table-responsive" id="calendar">
+            <div th:if="${!calendarError}">
+                <div class="table-responsive" id="calendar">
 
-                <!--                <table class="table table-bordered text-center align-middle">-->
-                <!--                    <thead class="table">-->
-                <!--                    <tr>-->
-                <!--                        <th>Day</th>-->
-                <!--                                        <th th:each="entry : ${weekSchedule.entrySet()}" th:if="${iter.index == 0}"-->
-                <!--                                            th:each="hour : ${entry.value[0]}"-->
-                <!--                                            th:text="${hour}">-->
-                <!--                                        </th>-->
-                <!--                    </tr>-->
-                <!--                    </thead>-->
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table">
+                        <tr>
+                            <th>Day</th>
+                            <th th:each="hour : ${calendarData.values().iterator().next().get(0)}"
+                                th:text="${hour}"></th>
+                        </tr>
+                        </thead>
 
-                <!--                    <tbody>-->
-                <!--                    <tr th:each="entry : ${calendarMap.entrySet()}">-->
+                        <tbody>
+                        <tr th:each="entry : ${calendarData.entrySet()}">
+                            <td th:text="${entry.key}"></td>
+                            <td th:each="status, iterStat : ${entry.value.get(1)}">
+                        <span th:switch="${status}">
+                            <span th:case="'Available'" class="badge bg-success-subtle text-success">Available</span>
+                            <span th:case="'Reserved'" class="badge bg-danger-subtle text-danger">Reserved</span>
+                            <span th:case="'Unavailable'"
+                                  class="badge bg-secondary-subtle text-secondary">Unavailable</span>
+                        </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-                <!--                        <td th:text="${entry.key}></td>-->
-                <!--                        <td th:each="status : ${entry.value[1]}">-->
-                <!--                                             <span th:switch="${status}">-->
-                <!--                                                <span th:case="'Available'" class="badge bg-success-subtle text-success">Available</span>-->
-                <!--                                                <span th:case="'Reserved'" class="badge bg-danger-subtle text-danger">Reserved</span>-->
-                <!--                                                <span th:case="'Unavailable'" class="badge bg-secondary-subtle text-secondary">Unavailable</span>-->
-                <!--                                             </span>-->
-                <!--                        </td>-->
-                <!--                    </tr>-->
-                <!--                    </tbody>-->
-                <!--                </table>-->
+                <div th:if="${calendarError}" id="calendarErrorMessage" class="alert alert-warning">
+                    Error occurred during loading calendar view.
+                </div>
 
+                <!--Dynamic:-->
+                <!--IF     HOUR IS NOT IN MAXIMUM HOURS_LIST     THEN UNAVAILABLE-->
 
                 <table class="table table-bordered text-center align-middle">
                     <thead class="table">
