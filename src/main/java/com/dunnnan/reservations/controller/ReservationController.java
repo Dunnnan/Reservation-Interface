@@ -43,6 +43,7 @@ public class ReservationController {
                 return "redirect:/home";
             }
 
+            model.addAttribute("calendarData", null);
             model.addAttribute("resource", resource.get());
             return "resource-detail";
         }

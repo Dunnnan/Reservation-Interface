@@ -129,10 +129,16 @@ public class ReservationService {
         Duration interval = reservationConstants.getReservationInterval();
 
         // Get availability period of resource
-        List<LocalTime> availability = availabilityService.getAvailabilityTimePeriod(resourceId, date);
+        List<LocalTime> availability = availabilityService.getAvailabilityTimePeriodOrReturnEmptyList(resourceId, date);
+        if (availability.isEmpty()) {
+            // Shouldn't be left like that
+            return List.of(List.of("8:00"), List.of("Unavailable"));
+        }
+
         LocalTime openingTime = availability.get(0);
         LocalTime closingTime = availability.get(1);
 
+        // Get possible reservation hours
         List<LocalTime> allPossibleHours = timeUtil.getAllPossibleReservationHours(openingTime, closingTime);
 
         // Specify occupied hours

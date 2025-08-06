@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -33,6 +34,14 @@ public class AvailabilityService {
     public List<LocalTime> getAvailabilityTimePeriod(Long id, LocalDate date) {
         Availability availability = getAvailabilityOfSpecificResourceForSpecificDay(id, date);
         return List.of(availability.getFrom(), availability.getTo());
+    }
+
+    public List<LocalTime> getAvailabilityTimePeriodOrReturnEmptyList(Long resourceId, LocalDate date) {
+        try {
+            return getAvailabilityTimePeriod(resourceId, date);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     public boolean isReservationPeriodAvailable(

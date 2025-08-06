@@ -148,8 +148,9 @@
         </div>
 
         <!--Calendar Grid-->
+        <!--Probably better to load it with js-->
         <div class="container py-5">
-            <div th:if="${!calendarError}">
+            <div th:if="${calendarData != null}">
                 <div class="table-responsive" id="calendar">
 
                     <table class="table table-bordered text-center align-middle">
@@ -177,7 +178,7 @@
                     </table>
                 </div>
 
-                <div th:if="${calendarError}" id="calendarErrorMessage" class="alert alert-warning">
+                <div th:if="${calendarData == null}" id="calendarErrorMessage" class="alert alert-warning">
                     Error occurred during loading calendar view.
                 </div>
 

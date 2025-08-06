@@ -131,10 +131,8 @@ public class ResourceController {
 
             try {
                 model.addAttribute("calendarData", reservationService.getReservationCalendar(id, weeksLater));
-                model.addAttribute("calendarError", false);
-                System.out.println(reservationService.getReservationCalendar(id, weeksLater));
             } catch (Exception e) {
-                model.addAttribute("calendarError", true);
+                model.addAttribute("calendarData", null);
             }
 
             return "resource-detail";
