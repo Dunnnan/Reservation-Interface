@@ -90,6 +90,36 @@ public class ReservationService {
                 .collect(Collectors.toSet());
     }
 
+    public List<LocalTime> getMaxReservationHourRangeForWeek(Long resourceId, Integer weeksLater) {
+        LocalDate monday = LocalDate.now(clock)
+                .plusWeeks(weeksLater)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+        List<LocalDate> calendarDays = IntStream.range(0, 7)
+                .mapToObj(monday::plusDays)
+                .toList();
+
+        List<LocalTime> calendarHours = new ArrayList<>();
+
+        for (LocalDate day : calendarDays) {
+            List<LocalTime> availability = availabilityService.getAvailabilityTimePeriodOrReturnEmptyList(resourceId, day);
+            if (!availability.isEmpty()) {
+                calendarHours.add(availability.get(0));
+                calendarHours.add(availability.get(1));
+            }
+        }
+
+        // Return empty list if there is none available time periods
+        if (calendarHours.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return timeUtil.getAllPossibleReservationHours(
+                Collections.min(calendarHours),
+                Collections.max(calendarHours)
+        );
+    }
+
     public List<String> getValidReservationHoursForDay(Long resourceId, LocalDate date) {
         Duration interval = reservationConstants.getReservationInterval();
 
@@ -133,6 +163,8 @@ public class ReservationService {
         if (availability.isEmpty()) {
             // Shouldn't be left like that
             return List.of(List.of("8:00"), List.of("Unavailable"));
+            // Doesn't work - WHY?
+            //  return null;
         }
 
         LocalTime openingTime = availability.get(0);

@@ -151,30 +151,41 @@
         <!--Probably better to load it with js-->
         <div class="container py-5">
             <div th:if="${calendarData != null}">
-                <div class="table-responsive" id="calendar">
+                <div class="table-responsive">
 
-                    <table class="table table-bordered text-center align-middle">
-                        <thead class="table">
+                    <table class="table table-bordered text-center align-middle" id="calendarTable">
+                        <thead>
                         <tr>
                             <th>Day</th>
-                            <th th:each="hour : ${calendarData.values().iterator().next().get(0)}"
-                                th:text="${hour}"></th>
+                            <th th:each="hour : ${calendarHours}" th:text="${hour}"></th>
                         </tr>
                         </thead>
 
                         <tbody>
                         <tr th:each="entry : ${calendarData.entrySet()}">
                             <td th:text="${entry.key}"></td>
-                            <td th:each="status, iterStat : ${entry.value.get(1)}">
-                        <span th:switch="${status}">
-                            <span th:case="'Available'" class="badge bg-success-subtle text-success">Available</span>
-                            <span th:case="'Reserved'" class="badge bg-danger-subtle text-danger">Reserved</span>
-                            <span th:case="'Unavailable'"
-                                  class="badge bg-secondary-subtle text-secondary">Unavailable</span>
-                        </span>
+
+                            <!--No available hours for the day-->
+                            <td th:if="${entry.value == null}"
+                                th:colspan="${#lists.size(calendarHours)}">
+                                <span class="badge bg-secondary-subtle text-secondary">
+                                    Unavailable
+                                </span>
+                            </td>
+
+                            <!--Available hours for the day-->
+                            <td th:each="status, iterStat : ${entry.value != null ? entry.value.get(1) : {}}"
+                                th:unless="${entry.value == null}">
+                            <span th:switch="${status}">
+                                <span th:case="'Available'"
+                                      class="badge bg-success-subtle text-success">Available</span>
+                                <span th:case="'Reserved'" class="badge bg-danger-subtle text-danger">Reserved</span>
+                                <span th:case="'Unavailable'" class="badge bg-secondary-subtle text-secondary">Unavailable</span>
+                            </span>
                             </td>
                         </tr>
                         </tbody>
+
                     </table>
                 </div>
 

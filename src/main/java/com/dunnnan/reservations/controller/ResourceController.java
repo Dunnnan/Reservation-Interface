@@ -131,6 +131,7 @@ public class ResourceController {
 
             try {
                 model.addAttribute("calendarData", reservationService.getReservationCalendar(id, weeksLater));
+                model.addAttribute("calendarHours", reservationService.getMaxReservationHourRangeForWeek(id, weeksLater));
             } catch (Exception e) {
                 model.addAttribute("calendarData", null);
             }
