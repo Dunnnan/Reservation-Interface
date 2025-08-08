@@ -163,10 +163,10 @@
 
                         <tbody>
                         <tr th:each="entry : ${calendarData.entrySet()}">
-                            <td th:text="${entry.key}"></td>
+                            <th th:text="${entry.key}"></th>
 
                             <!--No available hours for the day-->
-                            <td th:if="${entry.value == null}"
+                            <td th:if="${entry.value.get(1).get(0) == 'Null'}"
                                 th:colspan="${#lists.size(calendarHours)}">
                                 <span class="badge bg-secondary-subtle text-secondary">
                                     Unavailable
@@ -177,8 +177,7 @@
                             <td th:each="status, iterStat : ${entry.value != null ? entry.value.get(1) : {}}"
                                 th:unless="${entry.value == null}">
                             <span th:switch="${status}">
-                                <span th:case="'Available'"
-                                      class="badge bg-success-subtle text-success">Available</span>
+                                <span th:case="'Available'" class="badge bg-success-subtle text-success">Available</span>
                                 <span th:case="'Reserved'" class="badge bg-danger-subtle text-danger">Reserved</span>
                                 <span th:case="'Unavailable'" class="badge bg-secondary-subtle text-secondary">Unavailable</span>
                             </span>
@@ -187,10 +186,6 @@
                         </tbody>
 
                     </table>
-                </div>
-
-                <div th:if="${calendarData == null}" id="calendarErrorMessage" class="alert alert-warning">
-                    Error occurred during loading calendar view.
                 </div>
 
                 <!--Dynamic:-->
@@ -259,6 +254,11 @@
                 </table>
 
             </div>
+
+            <div th:if="${calendarData == null}" id="calendarErrorMessage" class="alert alert-warning">
+                Error occurred during loading calendar view.
+            </div>
+
         </div>
 
     </div>

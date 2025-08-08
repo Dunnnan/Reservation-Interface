@@ -44,6 +44,7 @@ public class ReservationController {
             }
 
             model.addAttribute("calendarData", null);
+            model.addAttribute("calendarHours", null);
             model.addAttribute("resource", resource.get());
             return "resource-detail";
         }
@@ -69,13 +70,6 @@ public class ReservationController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         return reservationService.getValidReservationHoursForDay(resourceId, date);
-
-//        if (period.equalsIgnoreCase("day")) {
-//            return reservationService.getValidReservationHoursForDay(resourceId, date);
-//        }
-//        else if (period.equalsIgnoreCase("week")) {
-//            return reservationService.getValidReservationHoursForWeek(resourceId, date);
-//        }
     }
 
 }

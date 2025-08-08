@@ -161,10 +161,7 @@ public class ReservationService {
         // Get availability period of resource
         List<LocalTime> availability = availabilityService.getAvailabilityTimePeriodOrReturnEmptyList(resourceId, date);
         if (availability.isEmpty()) {
-            // Shouldn't be left like that
-            return List.of(List.of("8:00"), List.of("Unavailable"));
-            // Doesn't work - WHY?
-            //  return null;
+            return List.of(List.of("0:00"), List.of("Null"));
         }
 
         LocalTime openingTime = availability.get(0);
@@ -185,6 +182,8 @@ public class ReservationService {
 
             if (occupiedHours.contains(hour)) {
                 hourStatuses.add("Reserved");
+            } else if (LocalDate.now(clock).isEqual(date) && LocalTime.now(clock).isAfter(hour)) {
+                hourStatuses.add("Unavailable");
             } else {
                 hourStatuses.add("Available");
             }
@@ -198,10 +197,11 @@ public class ReservationService {
                 .plusWeeks(weeksLater)
                 .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 
+        // Keep in mind: toMap doesn't allow 'null' values (leads to whole map being null)
         return IntStream.range(0, 7)
                 .mapToObj(monday::plusDays)
                 .collect(Collectors.toMap(
-                        day -> day.getDayOfWeek().toString(),
+                        day -> day.getDayOfWeek().toString() + "\n" + day,
                         day -> getAllPossibleReservationHoursWithStatus(resourceId, day),
                         (a, b) -> b,
                         LinkedHashMap::new
