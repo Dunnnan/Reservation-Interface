@@ -63,6 +63,7 @@
                         <form th:action="@{/reserve}" th:object="${reservation}" method="post">
                             <!--Resource ID-->
                             <input type="hidden" name="resourceId" th:value="${resource.id}">
+                            <input type="hidden" name="weeksLater" th:value="${weeksLater}">
 
                             <!--Date-->
                             <div class="mb-3">
@@ -138,13 +139,39 @@
         </div>
 
         <!--Time period-->
-        <div class="row justify-content-center mt-5">
-            <strong class="text-center">
-                Period:
-                <strong class="text-center">
+        <div class="row justify-content-center align-items-center mt-5">
+
+            <div class="text-center">
+                <strong>
+                    Period:<br>
+                    <span>
                     Date_1 -> Date_2
+                    </span>
                 </strong>
-            </strong>
+            </div>
+
+            <!--            &lt;!&ndash;Reset week&ndash;&gt;-->
+            <!--            <div class="mt-2 text-center" aria-label="Week navigation reset">-->
+            <!--                <a th:href="@{/resource/{id}(id=${resource.id}, weeksLater=${0})}"-->
+            <!--                   class="btn btn-outline-primary">-->
+            <!--                    Current week-->
+            <!--                </a>-->
+            <!--            </div>-->
+
+            <!--Calendar week navigation-->
+            <div class="btn-group mt-2" role="group" aria-label="Week navigation">
+                <a th:href="@{/resource/{id}(id=${resource.id}, weeksLater=${weeksLater - 1})}"
+                   class="btn"
+                   th:classappend="${weeksLater == 0} ? ' btn-outline-secondary disabled' : ' btn-outline-primary'"
+                   th:attr="aria-disabled=${weeksLater == 0} ? 'true' : null, tabindex=${weeksLater == 0} ? '-1' : null">
+                    Previous week
+                </a>
+
+                <a th:href="@{/resource/{id}(id=${resource.id}, weeksLater=${weeksLater + 1})}"
+                   class="btn btn-outline-primary">
+                    Next week
+                </a>
+            </div>
         </div>
 
         <!--Calendar Grid-->
@@ -174,13 +201,15 @@
                             </td>
 
                             <!--Available hours for the day-->
-                            <td th:each="status, iterStat : ${entry.value != null ? entry.value.get(1) : {}}"
-                                th:unless="${entry.value == null}">
-                            <span th:switch="${status}">
-                                <span th:case="'Available'" class="badge bg-success-subtle text-success">Available</span>
-                                <span th:case="'Reserved'" class="badge bg-danger-subtle text-danger">Reserved</span>
-                                <span th:case="'Unavailable'" class="badge bg-secondary-subtle text-secondary">Unavailable</span>
-                            </span>
+                            <td th:if="${entry.value.get(1).get(0) != 'Null'}"
+                                th:each="status, iterStat : ${entry.value.get(1)}">
+                                <span th:switch="${status}">
+                                    <span th:case="'Available'"
+                                          class="badge bg-success-subtle text-success">Available</span>
+                                    <span th:case="'Reserved'"
+                                          class="badge bg-danger-subtle text-danger">Reserved</span>
+                                    <span th:case="'Unavailable'" class="badge bg-secondary-subtle text-secondary">Unavailable</span>
+                                </span>
                             </td>
                         </tr>
                         </tbody>

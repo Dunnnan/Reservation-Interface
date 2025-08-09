@@ -29,6 +29,7 @@ public class ReservationController {
     @PostMapping("/reserve")
     public String createReservation(
             @ModelAttribute("reservation") @Validated ReservationDto reservationDto,
+            @RequestParam(defaultValue = "0") int weeksLater,
             BindingResult result,
             Model model,
             RedirectAttributes redirectAttributes
@@ -43,8 +44,7 @@ public class ReservationController {
                 return "redirect:/home";
             }
 
-            model.addAttribute("calendarData", null);
-            model.addAttribute("calendarHours", null);
+            reservationService.addCalendarDataToModel(reservationDto.getResourceId(), weeksLater, model);
             model.addAttribute("resource", resource.get());
             return "resource-detail";
         }

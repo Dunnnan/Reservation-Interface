@@ -128,13 +128,9 @@ public class ResourceController {
         if (resource.isPresent()) {
             model.addAttribute("resource", resource.get());
             model.addAttribute("reservation", new ReservationDto());
+            model.addAttribute("weeksLater", weeksLater);
 
-            try {
-                model.addAttribute("calendarData", reservationService.getReservationCalendar(id, weeksLater));
-                model.addAttribute("calendarHours", reservationService.getMaxReservationHourRangeForWeek(id, weeksLater));
-            } catch (Exception e) {
-                model.addAttribute("calendarData", null);
-            }
+            reservationService.addCalendarDataToModel(id, weeksLater, model);
 
             return "resource-detail";
         }

@@ -8,6 +8,7 @@ import com.dunnnan.reservations.util.TimeUtil;
 import com.dunnnan.reservations.validation.ReservationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import java.time.*;
@@ -197,7 +198,7 @@ public class ReservationService {
                 .plusWeeks(weeksLater)
                 .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 
-        // Keep in mind: toMap doesn't allow 'null' values (leads to whole map being null)
+        // Keep in mind: toMap doesn't allow 'null' values (leads to whole map being null due to NullPointerException)
         return IntStream.range(0, 7)
                 .mapToObj(monday::plusDays)
                 .collect(Collectors.toMap(
@@ -208,5 +209,12 @@ public class ReservationService {
                 ));
     }
 
-
+    public void addCalendarDataToModel(Long resourceId, Integer weeksLater, Model model) {
+        try {
+            model.addAttribute("calendarData", getReservationCalendar(resourceId, weeksLater));
+            model.addAttribute("calendarHours", getMaxReservationHourRangeForWeek(resourceId, weeksLater));
+        } catch (Exception e) {
+            model.addAttribute("calendarData", null);
+        }
+    }
 }
