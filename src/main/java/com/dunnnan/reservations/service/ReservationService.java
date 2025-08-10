@@ -86,7 +86,7 @@ public class ReservationService {
     public Set<LocalTime> getOccupiedHoursDuringTheDay(Long resourceId, LocalDate date) {
         return getAllReservationsByDateAndResourceId(resourceId, date).stream()
                 .flatMap(reservation -> timeUtil.getAllPossibleReservationHours(
-                        reservation.getFrom(), reservation.getTo()).stream()
+                        reservation.getFrom(), reservation.getTo(), false).stream()
                 )
                 .collect(Collectors.toSet());
     }
@@ -117,7 +117,8 @@ public class ReservationService {
 
         return timeUtil.getAllPossibleReservationHours(
                 Collections.min(calendarHours),
-                Collections.max(calendarHours)
+                Collections.max(calendarHours),
+                false
         );
     }
 
@@ -137,7 +138,7 @@ public class ReservationService {
 
         // Get all hours possible hours and exclude occupied ones
         Set<LocalTime> validHours = new HashSet<>(timeUtil.getAllPossibleReservationHours(
-                openingTime, closingTime));
+                openingTime, closingTime, true));
         validHours.removeAll(occupiedHours);
 
         // Remove past hours (today)
@@ -169,7 +170,7 @@ public class ReservationService {
         LocalTime closingTime = availability.get(1);
 
         // Get possible reservation hours
-        List<LocalTime> allPossibleHours = timeUtil.getAllPossibleReservationHours(openingTime, closingTime);
+        List<LocalTime> allPossibleHours = timeUtil.getAllPossibleReservationHours(openingTime, closingTime, false);
 
         // Specify occupied hours
         Set<LocalTime> occupiedHours = getOccupiedHoursDuringTheDay(resourceId, date);
@@ -213,6 +214,7 @@ public class ReservationService {
         try {
             model.addAttribute("calendarData", getReservationCalendar(resourceId, weeksLater));
             model.addAttribute("calendarHours", getMaxReservationHourRangeForWeek(resourceId, weeksLater));
+            model.addAttribute("weeksLater", weeksLater);
         } catch (Exception e) {
             model.addAttribute("calendarData", null);
         }

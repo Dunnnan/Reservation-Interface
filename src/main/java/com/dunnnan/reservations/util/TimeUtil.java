@@ -2,7 +2,6 @@ package com.dunnnan.reservations.util;
 
 import com.dunnnan.reservations.constants.ReservationConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -16,7 +15,7 @@ public class TimeUtil {
     @Autowired
     ReservationConstants reservationConstants;
 
-    public List<LocalTime> getAllPossibleReservationHours(LocalTime start, LocalTime end) {
+    public List<LocalTime> getAllPossibleReservationHours(LocalTime start, LocalTime end, boolean includeLastPeriod) {
         List<LocalTime> allPossibleReservationHours = new ArrayList<>();
 
         LocalTime period = start;
@@ -28,7 +27,9 @@ public class TimeUtil {
         }
 
         // Add last period
-        allPossibleReservationHours.add(period);
+        if (includeLastPeriod) {
+            allPossibleReservationHours.add(period);
+        }
 
         return allPossibleReservationHours;
     }

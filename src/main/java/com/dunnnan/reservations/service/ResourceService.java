@@ -15,10 +15,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.*;
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ResourceService {
@@ -173,32 +173,6 @@ public class ResourceService {
         return resourceRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Resource with id: " + id + " was not found")
         );
-    }
-
-    public LocalDate calculateStartDate(LocalDate today, short weeksLater) {
-        return today.plusWeeks(weeksLater);
-    }
-
-    public List<LocalDate> getWeekDays(LocalDate startDate) {
-        return IntStream.range(0, 7)
-                .mapToObj(startDate::plusDays)
-                .toList();
-    }
-
-    // Do oddzielnej klasy
-    public Map<LocalDate, List<LocalTime>> getReservationWeekDisplayInfo(LocalDate today, short weeksLater) {
-        Map<LocalDate, List<LocalTime>> reservations = new HashMap<>();
-        Map<LocalDate, List<LocalTime>> availability = new HashMap<>();
-
-        LocalDate startDate = calculateStartDate(today, weeksLater);
-        List<LocalDate> weekDays = getWeekDays(startDate);
-
-        for (LocalDate day : weekDays) {
-//            reservations.put(day, reservationService.);
-//            availability.put(day, availabilityService.);
-        }
-
-        return reservations;
     }
 
 }

@@ -128,7 +128,6 @@ public class ResourceController {
         if (resource.isPresent()) {
             model.addAttribute("resource", resource.get());
             model.addAttribute("reservation", new ReservationDto());
-            model.addAttribute("weeksLater", weeksLater);
 
             reservationService.addCalendarDataToModel(id, weeksLater, model);
 
