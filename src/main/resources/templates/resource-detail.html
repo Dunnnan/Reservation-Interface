@@ -358,16 +358,23 @@
                 if (data.length > 0) {
                     allAvailableHours = data;
 
-                    data.forEach(period => {
+                    <!--From select field-->
+                    data[0].forEach(period => {
                         const fromOption = document.createElement("option");
-                        const toOption = document.createElement("option");
 
                         fromOption.value = period;
                         fromOption.textContent = period;
+
+                        fromSelect.appendChild(fromOption);
+                    });
+
+                    <!--To select field-->
+                    data[1].forEach(period => {
+                        const toOption = document.createElement("option");
+
                         toOption.value = period;
                         toOption.textContent = period;
 
-                        fromSelect.appendChild(fromOption);
                         toSelect.appendChild(toOption);
                     });
 
@@ -384,7 +391,7 @@
         const selectedForm = this.value;
         const toSelect = document.getElementById("to");
 
-        const filtered = allAvailableHours.filter(hour => hour > selectedForm);
+        const filtered = allAvailableHours[1].filter(hour => hour > selectedForm);
         updateSelect(toSelect, filtered);
     })
 
@@ -393,7 +400,7 @@
 <!--        const selectedForm = this.value;-->
 <!--        const fromSelect = document.getElementById("from");-->
 
-<!--        const filtered = allAvailableHours.filter(hour => hour < selectedForm);-->
+<!--        const filtered = allAvailableHours[0].filter(hour => hour < selectedForm);-->
 <!--        updateSelect(fromSelect, filtered);-->
 <!--    })-->
 

@@ -64,7 +64,7 @@ public class ReservationController {
 
     @GetMapping("/reservations/availableHours")
     @ResponseBody
-    public List<String> getAvailableHours(
+    public List<List<String>> getAvailableHours(
             @RequestParam String period,
             @RequestParam Long resourceId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date

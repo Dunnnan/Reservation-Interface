@@ -73,22 +73,46 @@ public class ReservationService {
         return reservationRepository.findByDateAndResource_Id(date, id);
     }
 
-    public Set<LocalTime> filterHoursByNeighbor(Set<LocalTime> hoursSet, Duration interval, boolean requireBothNeighbors) {
-        return hoursSet.stream()
-                .filter(hour -> {
-                    boolean hasPrev = hoursSet.contains(hour.minus(interval));
-                    boolean hasNext = hoursSet.contains(hour.plus(interval));
-                    return requireBothNeighbors ? (hasPrev && hasNext) : (hasPrev || hasNext);
-                })
+    public Set<LocalTime> filterHoursByNeighbor(Set<LocalTime> filterSet, Set<LocalTime> referenceSet, Duration offset) {
+        Set<LocalTime> originalReference = new HashSet<>(referenceSet);
+
+        return filterSet.stream()
+                .filter(hour -> originalReference.contains(hour.plus(offset)))
                 .collect(Collectors.toSet());
     }
 
-    public Set<LocalTime> getOccupiedHoursDuringTheDay(Long resourceId, LocalDate date) {
-        return getAllReservationsByDateAndResourceId(resourceId, date).stream()
-                .flatMap(reservation -> timeUtil.getAllPossibleReservationHours(
-                        reservation.getFrom(), reservation.getTo(), false).stream()
-                )
-                .collect(Collectors.toSet());
+    public Set<LocalTime> getOccupiedHoursDuringTheDay(Long resourceId, LocalDate date, String hoursType) {
+        if (hoursType.equalsIgnoreCase("from")) {
+            return getAllReservationsByDateAndResourceId(resourceId, date).stream()
+                    .flatMap(reservation -> timeUtil.getAllPossibleReservationHours(
+                            reservation.getFrom(), reservation.getTo(), false).stream()
+                    )
+                    .collect(Collectors.toSet());
+        } else if (hoursType.equalsIgnoreCase("to")) {
+            return getAllReservationsByDateAndResourceId(resourceId, date).stream()
+                    .flatMap(reservation -> timeUtil.getAllPossibleReservationHours(
+                            reservation.getFrom().plus(reservationConstants.getReservationInterval()), reservation.getTo(), true).stream()
+                    )
+                    .collect(Collectors.toSet());
+        }
+
+        return Collections.emptySet();
+    }
+
+    public Set<LocalTime> getAvailableHours(LocalDate date, LocalTime openingTime, LocalTime closingTime, Set<LocalTime> occupiedHours, boolean includeLastPeriod) {
+        Set<LocalTime> hours = new HashSet<>(timeUtil.getAllPossibleReservationHours(
+                openingTime, closingTime, includeLastPeriod
+        ));
+        hours.removeAll(occupiedHours);
+
+        // Remove past hours (today)
+        if (LocalDate.now(clock).equals(date)) {
+            hours = hours.stream()
+                    .filter(hour -> hour.isAfter(LocalTime.now(clock)))
+                    .collect(Collectors.toSet());
+        }
+
+        return hours;
     }
 
     public List<LocalTime> getMaxReservationHourRangeForWeek(Long resourceId, Integer weeksLater) {
@@ -122,7 +146,7 @@ public class ReservationService {
         );
     }
 
-    public List<String> getValidReservationHoursForDay(Long resourceId, LocalDate date) {
+    public List<List<String>> getValidReservationHoursForDay(Long resourceId, LocalDate date) {
         Duration interval = reservationConstants.getReservationInterval();
 
         // Get availability period of resource
@@ -131,30 +155,27 @@ public class ReservationService {
         LocalTime closingTime = availability.get(1);
 
         // Specify occupied hours
-        Set<LocalTime> occupiedHours = getOccupiedHoursDuringTheDay(resourceId, date);
+        Set<LocalTime> occupiedFromHours = getOccupiedHoursDuringTheDay(resourceId, date, "from");
+        Set<LocalTime> occupiedToHours = getOccupiedHoursDuringTheDay(resourceId, date, "to");
 
-        // Remove hours that are not part of the reservation (beginning / end)
-        occupiedHours = filterHoursByNeighbor(occupiedHours, interval, true);
-
-        // Get all hours possible hours and exclude occupied ones
-        Set<LocalTime> validHours = new HashSet<>(timeUtil.getAllPossibleReservationHours(
-                openingTime, closingTime, true));
-        validHours.removeAll(occupiedHours);
-
-        // Remove past hours (today)
-        if (LocalDate.now(clock).equals(date)) {
-            validHours = validHours.stream()
-                    .filter(hour -> hour.isAfter(LocalTime.now(clock)))
-                    .collect(Collectors.toSet());
-        }
+        // Get all available hours
+        Set<LocalTime> fromHours = getAvailableHours(date, openingTime, closingTime, occupiedFromHours, false);
+        Set<LocalTime> toHours = getAvailableHours(date, openingTime.plus(interval), closingTime, occupiedToHours, true);
 
         // Remove isolated hours (have no neighbor)
-        validHours = filterHoursByNeighbor(validHours, interval, false);
+        fromHours = filterHoursByNeighbor(fromHours, toHours, interval);
+        toHours = filterHoursByNeighbor(toHours, fromHours, interval.negated());
 
-        return validHours.stream()
-                .sorted()
-                .map(LocalTime::toString)
-                .toList();
+        return List.of(
+                fromHours.stream()
+                        .sorted()
+                        .map(LocalTime::toString)
+                        .toList(),
+                toHours.stream()
+                        .sorted()
+                        .map(LocalTime::toString)
+                        .toList()
+        );
     }
 
     public List<List<String>> getAllPossibleReservationHoursWithStatus(Long resourceId, LocalDate date) {
@@ -173,7 +194,7 @@ public class ReservationService {
         List<LocalTime> allPossibleHours = timeUtil.getAllPossibleReservationHours(openingTime, closingTime, false);
 
         // Specify occupied hours
-        Set<LocalTime> occupiedHours = getOccupiedHoursDuringTheDay(resourceId, date);
+        Set<LocalTime> occupiedHours = getOccupiedHoursDuringTheDay(resourceId, date, "from");
 
         List<String> hourLabels = new ArrayList<>();
         List<String> hourStatuses = new ArrayList<>();
