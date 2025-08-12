@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -232,7 +233,17 @@ public class ReservationService {
     }
 
     public void addCalendarDataToModel(Long resourceId, Integer weeksLater, Model model) {
+        weeksLater = reservationValidator.validateWeeksLater(weeksLater);
+
         try {
+            model.addAttribute("periodStart", LocalDate.now(clock)
+                    .plusWeeks(weeksLater)
+                    .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                    .format(DateTimeFormatter.ofPattern("d MMMM")));
+            model.addAttribute("periodEnd", LocalDate.now(clock)
+                    .plusWeeks(weeksLater)
+                    .with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+                    .format(DateTimeFormatter.ofPattern("d MMMM")));
             model.addAttribute("calendarData", getReservationCalendar(resourceId, weeksLater));
             model.addAttribute("calendarHours", getMaxReservationHourRangeForWeek(resourceId, weeksLater));
             model.addAttribute("weeksLater", weeksLater);

@@ -1,5 +1,6 @@
 package com.dunnnan.reservations.validation;
 
+import com.dunnnan.reservations.constants.ReservationConstants;
 import com.dunnnan.reservations.model.dto.ReservationDto;
 import com.dunnnan.reservations.repository.ReservationRepository;
 import com.dunnnan.reservations.service.AvailabilityService;
@@ -28,6 +29,9 @@ public class ReservationValidator {
     private AvailabilityService availabilityService;
 
     @Autowired
+    private ReservationConstants reservationConstants;
+
+    @Autowired
     private TimeUtil timeUtil;
 
     public ReservationValidator(Clock clock) {
@@ -49,6 +53,16 @@ public class ReservationValidator {
 
     public boolean resourceExists(Long id) {
         return resourceService.getResourceById(id).isPresent();
+    }
+
+    public Integer validateWeeksLater(Integer weeksLater) {
+        if (weeksLater < 0) {
+            return 0;
+        } else if (weeksLater > reservationConstants.getMaxFrontReservationDays() / 7) {
+            return (int) reservationConstants.getMaxFrontReservationDays() / 7;
+        }
+
+        return weeksLater;
     }
 
     public BindingResult validateReservation(ReservationDto reservationDto, BindingResult result) {

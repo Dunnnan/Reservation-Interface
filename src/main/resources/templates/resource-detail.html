@@ -176,31 +176,31 @@
             <div class="text-center">
                 <strong>
                     Period:<br>
-                    <span>
-                    Date_1 -> Date_2
-                    </span>
+                    <span th:text="${periodStart}"></span>
+                    ->
+                    <span th:text="${periodEnd}"></span>
                 </strong>
             </div>
 
-            <!--            &lt;!&ndash;Reset week&ndash;&gt;-->
-            <!--            <div class="mt-2 text-center" aria-label="Week navigation reset">-->
-            <!--                <a th:href="@{/resource/{id}(id=${resource.id}, weeksLater=${0})}"-->
-            <!--                   class="btn btn-outline-primary">-->
-            <!--                    Current week-->
-            <!--                </a>-->
-            <!--            </div>-->
+            <!--Reset week-->
+            <div th:if="${weeksLater > 0}" class="btn-group mt-2 text-center" aria-label="Week navigation reset">
+                <a th:href="@{/resource/{id}(id=${resource.id}, weeksLater=${0})}"
+                   class="btn btn-outline-primary">
+                    Current week
+                </a>
+            </div>
 
             <!--Calendar week navigation-->
             <div class="btn-group mt-2" role="group" aria-label="Week navigation">
                 <a th:href="@{/resource/{id}(id=${resource.id}, weeksLater=${weeksLater - 1})}"
-                   class="btn"
+                   class="btn w-50"
                    th:classappend="${weeksLater == 0} ? ' btn-outline-secondary disabled' : ' btn-outline-primary'"
                    th:attr="aria-disabled=${weeksLater == 0} ? 'true' : null, tabindex=${weeksLater == 0} ? '-1' : null">
                     Previous week
                 </a>
 
                 <a th:href="@{/resource/{id}(id=${resource.id}, weeksLater=${weeksLater + 1})}"
-                   class="btn btn-outline-primary">
+                   class="btn btn-outline-primary w-50">
                     Next week
                 </a>
             </div>
@@ -217,6 +217,7 @@
                         <tr>
                             <th>Day</th>
                             <th th:each="hour : ${calendarHours}" th:text="${hour}"></th>
+                            <th th:if="${calendarHours == null or calendarHours.isEmpty()}"></th>
                         </tr>
                         </thead>
 
@@ -248,72 +249,6 @@
 
                     </table>
                 </div>
-
-                <!--Dynamic:-->
-                <!--IF     HOUR IS NOT IN MAXIMUM HOURS_LIST     THEN UNAVAILABLE-->
-
-                <table class="table table-bordered text-center align-middle">
-                    <thead class="table">
-                    <tr>
-                        <th>Day</th>
-                        <th>08:00</th>
-                        <th>08:30</th>
-                        <th>09:00</th>
-                        <th>09:30</th>
-                        <th>10:00</th>
-                        <th>10:30</th>
-                        <th>11:00</th>
-                        <th>11:30</th>
-                        <th>12:00</th>
-                        <th>12:30</th>
-                        <th>13:00</th>
-                        <th>13:30</th>
-                        <th>14:00</th>
-                        <th>14:30</th>
-                        <th>15:00</th>
-                        <th>15:30</th>
-                        <th>16:00</th>
-                        <th>16:30</th>
-                        <th>17:00</th>
-                        <th>17:30</th>
-                        <th>18:00</th>
-                        <th>18:30</th>
-                        <th>19:00</th>
-                        <th>19:30</th>
-                        <th>20:00</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    <tr>
-                        <td>Monday (2025-08-04)</td>
-                        <td class="bg-success-subtle text-success"> Available</td>
-                        <td class="bg-danger-subtle text-danger"> Reserved</td>
-                        <td class="bg-success-subtle text-success"> Available</td>
-                        <td class="bg-secondary-subtle text-secondary"> Unavailable</td>
-                        <td class="bg-success-subtle text-success"> Available</td>
-                        <td><span class="badge bg-secondary-subtle text-secondary">Unavailable</span></td>
-                        <td><span class="badge bg-success-subtle text-success">Available</span></td>
-                        <td><span class="badge bg-danger-subtle text-danger">Reserved</span></td>
-                        <td><span class="badge bg-success-subtle text-success">Available</span></td>
-                        <td><span class="badge bg-secondary-subtle text-secondary">Unavailable</span></td>
-                    </tr>
-                    <tr>
-                        <td>Tuesday (2025-08-05)</td>
-                        <td class="bg-success-subtle text-success"> Available</td>
-                        <td class="bg-danger-subtle text-danger"> Reserved</td>
-                        <td class="bg-success-subtle text-success"> Available</td>
-                        <td class="bg-secondary-subtle text-secondary"> Unavailable</td>
-                        <td class="bg-success-subtle text-success"> Available</td>
-                        <td><span class="badge bg-secondary-subtle text-secondary">Unavailable</span></td>
-                        <td><span class="badge bg-success-subtle text-success">Available</span></td>
-                        <td><span class="badge bg-danger-subtle text-danger">Reserved</span></td>
-                        <td><span class="badge bg-success-subtle text-success">Available</span></td>
-                        <td><span class="badge bg-secondary-subtle text-secondary">Unavailable</span></td>
-                    </tr>
-                    </tbody>
-                </table>
-
             </div>
 
             <div th:if="${calendarData == null}" id="calendarErrorMessage" class="alert alert-warning">
