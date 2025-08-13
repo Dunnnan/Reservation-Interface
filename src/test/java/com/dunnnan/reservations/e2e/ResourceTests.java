@@ -1,19 +1,25 @@
 package com.dunnnan.reservations.e2e;
 
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
+import java.util.Objects;
 
 public class ResourceTests {
 
@@ -29,6 +35,11 @@ public class ResourceTests {
     private static final String HOME_URL_FRAGMENT = "/home";
 
     private static final String SEARCH_PHRASE = "Larry";
+
+    private static final String NEW_RESOURCE_NAME = "0_New Resource";
+    private static final String NEW_RESOURCE_DESCRIPTION = "A description of the new resource.";
+    private static final String NEW_RESOURCE_IMAGE = "";
+    private static final String NEW_RESOURCE_TYPE = "A description of the new resource.";
 
     private WebDriver webDriver;
     private WebDriverWait webDriverWait;
@@ -77,16 +88,25 @@ public class ResourceTests {
         webDriverWait.until(driver -> driver.getCurrentUrl().contains(RESOURCE_URL_FRAGMENT));
     }
 
-    //
+
     @When("User clicks on a pagination control")
     public void user_clicks_on_a_pagination_control() {
-        webDriver.findElement(By.cssSelector(".pagination-next")).click();
+        WebElement nextButton = webDriverWait.until(
+                ExpectedConditions.elementToBeClickable(By.xpath("//button[normalize-space()='Next']"))
+        );
+        ((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView(true);", nextButton);
+        try {
+            nextButton.click();
+        } catch (org.openqa.selenium.ElementClickInterceptedException e) {
+            ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", nextButton);
+        }
     }
 
     @Then("The resource grid should update with the next page of results")
     public void resource_grid_should_update_with_next_page() {
         webDriverWait.until(driver -> driver.findElement(By.cssSelector(".resource-grid")));
     }
+
 
     @When("User enters a search phrase into the search bar")
     public void user_enters_search_phrase() {
@@ -100,30 +120,36 @@ public class ResourceTests {
 
     @Then("The resource grid should update to show results")
     public void resource_grid_should_update_with_search_results() {
-        webDriverWait.until(driver -> driver.findElements(By.cssSelector(".resource-card")).size() > 0);
+        webDriverWait.until(driver -> !driver.findElements(By.cssSelector(".resource-card")).isEmpty());
     }
 
 
     @When("User picks a filter parameter from the list")
     public void user_picks_filter_parameter() {
-//        Select filterSelect = new Select(webDriver.findElement(By.name("filter")));
-//        filterSelect.selectByVisibleText("CAT");
+        WebElement catCheckbox = webDriver.findElement(By.id("type_CAT"));
+        if (!catCheckbox.isSelected()) {
+            catCheckbox.click();
+        }
+        webDriver.findElement(By.cssSelector("button[type='submit']")).click();
     }
 
     @Then("The resource grid should update to show filtered results")
     public void resource_grid_should_update_with_filtered_results() {
-        webDriverWait.until(driver -> driver.findElements(By.cssSelector(".resource-card")).size() > 0);
+        webDriverWait.until(driver -> !driver.findElements(By.cssSelector(".resource-card")).isEmpty());
+        List<WebElement> results = webDriver.findElements(By.cssSelector(".resource-card"));
+        System.out.println(results);
+        Assertions.assertTrue(results.stream().allMatch(item -> item.getText().contains("CAT")));
     }
+
 
     @When("User picks a sort parameter from the list")
     public void user_picks_sort_parameter() {
-//        Select sortSelect = new Select(webDriver.findElement(By.name("sort")));
-//        sortSelect.selectByVisibleText("Name");
+        webDriver.findElement(By.id("sortName")).click();
     }
 
     @Then("The resource grid should update to show sorted results")
     public void resource_grid_should_update_with_sorted_results() {
-        webDriverWait.until(driver -> driver.findElements(By.cssSelector(".resource-card")).size() > 0);
+        webDriverWait.until(driver -> !driver.findElements(By.cssSelector(".resource-card")).isEmpty());
     }
 
 
@@ -133,7 +159,7 @@ public class ResourceTests {
         webDriver.findElement(By.name("email")).sendKeys(EMPLOYEE_EMAIL);
         webDriver.findElement(By.name("password")).sendKeys(EMPLOYEE_PASSWORD);
         webDriver.findElement(By.cssSelector("button[type='submit']")).click();
-        webDriverWait.until(driver -> driver.getCurrentUrl().contains(HOME_URL_FRAGMENT));
+        webDriverWait.until(driver -> Objects.requireNonNull(driver.getCurrentUrl()).contains(HOME_URL_FRAGMENT));
     }
 
     @When("User clicks the \"Add Resource\" button")
@@ -158,10 +184,10 @@ public class ResourceTests {
         File dummyFile = File.createTempFile("dummy", ".png");
         dummyFile.deleteOnExit();
 
-        webDriver.findElement(By.name("name")).sendKeys("0_New Resource");
-        webDriver.findElement(By.name("description")).sendKeys("A description of the new resource.");
+        webDriver.findElement(By.name("name")).sendKeys(NEW_RESOURCE_NAME);
+        webDriver.findElement(By.name("description")).sendKeys(NEW_RESOURCE_DESCRIPTION);
         webDriver.findElement(By.name("image")).sendKeys(dummyFile.getAbsolutePath());
-        webDriver.findElement(By.name("type")).sendKeys("A description of the new resource.");
+        webDriver.findElement(By.name("type")).sendKeys(NEW_RESOURCE_TYPE);
     }
 
     @When("User submits the form")
@@ -174,9 +200,10 @@ public class ResourceTests {
         webDriverWait.until(driver -> !driver.findElements(By.xpath("//*[contains(text(), '0_New Resource')]")).isEmpty());
     }
 
+
     @Then("The pop-up should close")
     public void popup_should_close() {
-        webDriverWait.until(driver -> driver.findElements(By.id("addResourceModal")).isEmpty());
+        webDriverWait.until(driver -> !driver.findElement(By.id("addResourceModal")).isDisplayed());
     }
 
 }

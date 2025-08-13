@@ -5,6 +5,7 @@ import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
 import com.dunnnan.reservations.repository.ResourceRepository;
 import com.dunnnan.reservations.service.AvailabilityService;
+import com.dunnnan.reservations.service.ReservationService;
 import com.dunnnan.reservations.service.UserService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeAll;
@@ -51,6 +52,12 @@ public class ReservationTests {
 
     @Autowired
     private AvailabilityService availabilityService;
+
+    @Autowired
+    private ReservationService reservationService;
+
+    @Autowired
+    private ReservationController reservationController;
 
     @Autowired
     @Qualifier("fixedClock")
@@ -186,6 +193,19 @@ public class ReservationTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("resource-detail"))
                 .andExpect(content().string(containsString("text-danger")));
+    }
+
+    // Calendar Element - table of reservation availability
+    @Test
+    public void shouldGetWeekAvailableHours() throws Exception {
+        mockMvc.perform(get("/reservations/availableHours")
+                        .param("resourceId", String.valueOf(resourceId))
+                        .param("date", String.valueOf(LocalDate.now(fixedClock).plusDays(1)))
+                        .with(user(userDetails))
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$").isArray());
     }
 
 }

@@ -48,16 +48,16 @@ public class ReservationTests {
         }
     }
 
-    @Given("User is authenticated")
-    public void user_is_authenticated() {
-        webDriver.get(LOGIN_URL);
-
-        webDriver.findElement(By.name("email")).sendKeys(DEFAULT_EMAIL);
-        webDriver.findElement(By.name("password")).sendKeys(DEFAULT_PASSWORD);
-        webDriver.findElement(By.cssSelector("button[type='submit']")).click();
-
-        webDriverWait.until(webDriver -> webDriver.getCurrentUrl().contains(HOME_URL_FRAGMENT));
-    }
+//    @Given("User is authenticated")
+//    public void user_is_authenticated() {
+//        webDriver.get(LOGIN_URL);
+//
+//        webDriver.findElement(By.name("email")).sendKeys(DEFAULT_EMAIL);
+//        webDriver.findElement(By.name("password")).sendKeys(DEFAULT_PASSWORD);
+//        webDriver.findElement(By.cssSelector("button[type='submit']")).click();
+//
+//        webDriverWait.until(webDriver -> webDriver.getCurrentUrl().contains(HOME_URL_FRAGMENT));
+//    }
 
     @Given("User is at resource's dedicated page")
     public void user_is_at_resources_dedicated_page() {

@@ -272,7 +272,7 @@
 
         if (!selectedDate || !resourceId) return;
 
-        fetch(`/reservations/availableHours?period=day&resourceId=${resourceId}&date=${selectedDate}`)
+        fetch(`/reservations/availableHours?resourceId=${resourceId}&date=${selectedDate}`)
             .then(response => response.json())
             .then(data => {
                 const fromSelect = document.getElementById("from")
