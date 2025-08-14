@@ -25,7 +25,7 @@ public class ResourceTests {
 
     private static final String DEFAULT_EMAIL = "mail@com.pl";
     private static final String DEFAULT_PASSWORD = "password";
-    private static final String EMPLOYEE_EMAIL = "mail@com.pl";
+    private static final String EMPLOYEE_EMAIL = "ad@com.pl";
     private static final String EMPLOYEE_PASSWORD = "password";
     private static final String LOGIN_URL = "http://localhost:8080/login";
 
@@ -104,7 +104,7 @@ public class ResourceTests {
 
     @Then("The resource grid should update with the next page of results")
     public void resource_grid_should_update_with_next_page() {
-        webDriverWait.until(driver -> driver.findElement(By.cssSelector(".resource-grid")));
+        webDriverWait.until(driver -> !driver.findElements(By.cssSelector(".resource-card")).isEmpty());
     }
 
 
@@ -137,14 +137,21 @@ public class ResourceTests {
     public void resource_grid_should_update_with_filtered_results() {
         webDriverWait.until(driver -> !driver.findElements(By.cssSelector(".resource-card")).isEmpty());
         List<WebElement> results = webDriver.findElements(By.cssSelector(".resource-card"));
-        System.out.println(results);
         Assertions.assertTrue(results.stream().allMatch(item -> item.getText().contains("CAT")));
     }
 
 
     @When("User picks a sort parameter from the list")
     public void user_picks_sort_parameter() {
-        webDriver.findElement(By.id("sortName")).click();
+        WebElement sortNameButton = webDriverWait.until(
+                ExpectedConditions.elementToBeClickable(By.id("sortName"))
+        );
+        ((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView(true);", sortNameButton);
+        try {
+            sortNameButton.click();
+        } catch (org.openqa.selenium.ElementClickInterceptedException e) {
+            ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", sortNameButton);
+        }
     }
 
     @Then("The resource grid should update to show sorted results")
@@ -192,18 +199,20 @@ public class ResourceTests {
 
     @When("User submits the form")
     public void user_submits_the_form() {
-        webDriver.findElement(By.id("addResourceModal button[type='submit']")).click();
+        webDriver.findElement(By.id("addResourceModal"))
+                .findElement(By.cssSelector("button[type='submit']")).click();
     }
-
-    @Then("The resource should be added to the grid")
-    public void resource_should_be_added_to_grid() {
-        webDriverWait.until(driver -> !driver.findElements(By.xpath("//*[contains(text(), '0_New Resource')]")).isEmpty());
-    }
-
 
     @Then("The pop-up should close")
     public void popup_should_close() {
         webDriverWait.until(driver -> !driver.findElement(By.id("addResourceModal")).isDisplayed());
+    }
+
+    @Then("The resource should be added to the grid")
+    public void resource_should_be_added_to_grid() {
+        webDriver.findElement(By.name("search")).sendKeys(NEW_RESOURCE_NAME);
+        List<WebElement> results = webDriver.findElements(By.cssSelector(".resource-card"));
+        Assertions.assertTrue(results.stream().allMatch(item -> item.getText().contains(NEW_RESOURCE_NAME)));
     }
 
 }

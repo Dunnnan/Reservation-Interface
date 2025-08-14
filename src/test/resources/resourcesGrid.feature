@@ -40,5 +40,5 @@ Feature: Resources Grid
     And The add resource pop-up is open
     When User fills in valid data
     And User submits the form
-    Then The resource should be added to the grid
-    And The pop-up should close
+    Then The pop-up should close
+    And The resource should be added to the grid
