@@ -195,7 +195,7 @@
             <div class="col-12 col-md-4">
                 <div class="card p-3">
                     <h5>Filters</h5>
-                    <form method="get" th:action="@{home}">
+                    <form method="get" th:action="@{home}" id="filter">
                         <!--Other-->
                         <input type="hidden" name="sortField" th:value="${sortField}"
                                th:if="${sortField != null and !#strings.isEmpty(sortField)}"/>

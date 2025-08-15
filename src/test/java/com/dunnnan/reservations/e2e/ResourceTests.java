@@ -15,6 +15,9 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
@@ -115,6 +118,7 @@ public class ResourceTests {
 
     @When("User submits the search")
     public void user_submits_the_search() {
+        // Keep in mind: this works because search submit button is the first submit button on the page
         webDriver.findElement(By.cssSelector("button[type='submit']")).click();
     }
 
@@ -126,11 +130,14 @@ public class ResourceTests {
 
     @When("User picks a filter parameter from the list")
     public void user_picks_filter_parameter() {
+        webDriverWait.until(driver -> !driver.findElements(By.id("type_CAT")).isEmpty());
+
         WebElement catCheckbox = webDriver.findElement(By.id("type_CAT"));
         if (!catCheckbox.isSelected()) {
             catCheckbox.click();
         }
-        webDriver.findElement(By.cssSelector("button[type='submit']")).click();
+        webDriver.findElement(By.id("filter"))
+                .findElement(By.cssSelector("button[type='submit']")).click();
     }
 
     @Then("The resource grid should update to show filtered results")
@@ -191,10 +198,17 @@ public class ResourceTests {
         File dummyFile = File.createTempFile("dummy", ".png");
         dummyFile.deleteOnExit();
 
-        webDriver.findElement(By.name("name")).sendKeys(NEW_RESOURCE_NAME);
-        webDriver.findElement(By.name("description")).sendKeys(NEW_RESOURCE_DESCRIPTION);
-        webDriver.findElement(By.name("image")).sendKeys(dummyFile.getAbsolutePath());
-        webDriver.findElement(By.name("type")).sendKeys(NEW_RESOURCE_TYPE);
+        BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = img.createGraphics();
+        g.setColor(Color.RED);
+        g.fillRect(0, 0, 10, 10);
+        g.dispose();
+        ImageIO.write(img, "png", dummyFile);
+
+        webDriver.findElement(By.id("name")).sendKeys(NEW_RESOURCE_NAME);
+        webDriver.findElement(By.id("description")).sendKeys(NEW_RESOURCE_DESCRIPTION);
+        webDriver.findElement(By.id("image")).sendKeys(dummyFile.getAbsolutePath());
+        webDriver.findElement(By.id("type")).sendKeys(NEW_RESOURCE_TYPE);
     }
 
     @When("User submits the form")
@@ -211,8 +225,11 @@ public class ResourceTests {
     @Then("The resource should be added to the grid")
     public void resource_should_be_added_to_grid() {
         webDriver.findElement(By.name("search")).sendKeys(NEW_RESOURCE_NAME);
+        webDriver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        webDriverWait.until(driver -> driver.findElement(By.cssSelector(".resource-card")).isDisplayed());
         List<WebElement> results = webDriver.findElements(By.cssSelector(".resource-card"));
-        Assertions.assertTrue(results.stream().allMatch(item -> item.getText().contains(NEW_RESOURCE_NAME)));
+        Assertions.assertTrue(results.stream().anyMatch(item -> item.getText().contains(NEW_RESOURCE_NAME)));
     }
 
 }
