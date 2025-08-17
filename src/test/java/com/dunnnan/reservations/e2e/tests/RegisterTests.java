@@ -1,24 +1,26 @@
-package com.dunnnan.reservations.e2e;
+package com.dunnnan.reservations.e2e.tests;
 
+import com.dunnnan.reservations.e2e.config.SharedDriver;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Duration;
 import java.util.Objects;
 
 import static org.junit.Assert.assertTrue;
 
 public class RegisterTests {
+
+    @Autowired
+    private SharedDriver sharedDriver;
 
     private static final String DEFAULT_NAME = "name";
     private static final String DEFAULT_SURNAME = "surname";
@@ -35,10 +37,8 @@ public class RegisterTests {
 
     @Before
     public void setUp() {
-        WebDriverManager.chromedriver().setup();
-        webDriver = new ChromeDriver();
-        webDriverWait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
-        webDriver.manage().window().maximize();
+        webDriver = sharedDriver.getWebDriver();
+        webDriverWait = sharedDriver.getWebDriverWait();
     }
 
     @After

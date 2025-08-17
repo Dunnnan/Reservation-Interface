@@ -1,30 +1,32 @@
-package com.dunnnan.reservations.e2e;
+package com.dunnnan.reservations.e2e.tests;
 
+import com.dunnnan.reservations.e2e.config.SharedDriver;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
 public class ResourceTests {
+
+    @Autowired
+    private SharedDriver sharedDriver;
 
     private static final String DEFAULT_EMAIL = "mail@com.pl";
     private static final String DEFAULT_PASSWORD = "password";
@@ -50,10 +52,8 @@ public class ResourceTests {
 
     @Before
     public void setUp() {
-        WebDriverManager.chromedriver().setup();
-        webDriver = new ChromeDriver();
-        webDriverWait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
-        webDriver.manage().window().maximize();
+        webDriver = sharedDriver.getWebDriver();
+        webDriverWait = sharedDriver.getWebDriverWait();
     }
 
     @After

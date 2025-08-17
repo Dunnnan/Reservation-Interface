@@ -1,23 +1,21 @@
-package com.dunnnan.reservations.e2e;
+package com.dunnnan.reservations.e2e.tests;
 
+import com.dunnnan.reservations.e2e.config.SharedDriver;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.time.Clock;
-import java.time.Duration;
 import java.time.LocalDate;
 
 public class ReservationTests {
@@ -25,6 +23,9 @@ public class ReservationTests {
     @Autowired
     @Qualifier("fixedClock")
     private Clock fixedClock;
+
+    @Autowired
+    private SharedDriver sharedDriver;
 
     private static final String DEFAULT_EMAIL = "mail@com.pl";
     private static final String DEFAULT_PASSWORD = "password";
@@ -47,15 +48,12 @@ public class ReservationTests {
 
     @Before
     public void setUp() {
-        WebDriverManager.chromedriver().setup();
-        webDriver = new ChromeDriver();
-        webDriverWait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
-        webDriver.manage().window().maximize();
+        webDriver = sharedDriver.getWebDriver();
+        webDriverWait = sharedDriver.getWebDriverWait();
 
         YESTERDAY_DATE = LocalDate.now(fixedClock).minusDays(1).toString();
         TODAY_DATE = LocalDate.now(fixedClock).toString();
         TOMORROW_DATE = LocalDate.now(fixedClock).plusDays(1).toString();
-
     }
 
     @After
@@ -117,8 +115,8 @@ public class ReservationTests {
         }
     }
 
-    @Then("User should reserve resource")
-    public void user_should_reserve_resource() {
+    @Then("User should see the success message")
+    public void user_should_see_the_success_message() {
         webDriverWait.until(webDriver -> webDriver.findElement(By.className("alert-success")).isDisplayed());
     }
 
@@ -139,8 +137,8 @@ public class ReservationTests {
         // Will be tested by result
     }
 
-    @Then("see the error message")
-    public void see_the_error_message() {
+    @Then("User should see the error message")
+    public void user_should_see_the_error_message() {
         webDriverWait.until(webDriver -> webDriver.findElement(By.className("text-danger")).isDisplayed());
     }
 
