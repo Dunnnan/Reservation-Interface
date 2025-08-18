@@ -56,12 +56,12 @@ public class ResourceTests {
         webDriverWait = sharedDriver.getWebDriverWait();
     }
 
-    @After
-    public void tearDown() {
-        if (webDriver != null) {
-            webDriver.quit();
-        }
-    }
+//    @After
+//    public void tearDown() {
+//        if (webDriver != null) {
+//            webDriver.quit();
+//        }
+//    }
 
 
     @Given("User is authenticated")

@@ -56,12 +56,12 @@ public class ReservationTests {
         TOMORROW_DATE = LocalDate.now(fixedClock).plusDays(1).toString();
     }
 
-    @After
-    public void tearDown() {
-        if (webDriver != null) {
-            webDriver.quit();
-        }
-    }
+//    @After
+//    public void tearDown() {
+//        if (webDriver != null) {
+//            webDriver.quit();
+//        }
+//    }
 
     @Given("User is at resource's dedicated page")
     public void user_is_at_resources_dedicated_page() {
@@ -132,11 +132,6 @@ public class ReservationTests {
         webDriver.findElement(By.name("to")).sendKeys(FROM);
     }
 
-    @Then("User should not reserve resource")
-    public void user_should_not_reserve_resource() {
-        // Will be tested by result
-    }
-
     @Then("User should see the error message")
     public void user_should_see_the_error_message() {
         webDriverWait.until(webDriver -> webDriver.findElement(By.className("text-danger")).isDisplayed());
@@ -150,8 +145,4 @@ public class ReservationTests {
 //        user_clicks_reserve_button();
     }
 
-    @Then("User should not be able to reserve resource")
-    public void user_should_not_be_able_to_reserve_resource() {
-        // Will be tested by results
-    }
 }
