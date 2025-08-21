@@ -1,7 +1,6 @@
 package com.dunnnan.reservations.e2e.config;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import jakarta.annotation.PreDestroy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -28,13 +27,6 @@ public class SharedDriver {
 
     public WebDriverWait getWebDriverWait() {
         return webDriverWait;
-    }
-
-    @PreDestroy
-    public void quit() {
-        if (webDriver != null) {
-            webDriver.quit();
-        }
     }
 
 }

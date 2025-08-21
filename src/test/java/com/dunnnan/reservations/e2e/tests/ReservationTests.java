@@ -1,7 +1,6 @@
 package com.dunnnan.reservations.e2e.tests;
 
 import com.dunnnan.reservations.e2e.config.SharedDriver;
-import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -20,24 +19,20 @@ import java.time.LocalDate;
 
 public class ReservationTests {
 
-    @Autowired
-    @Qualifier("fixedClock")
-    private Clock fixedClock;
-
-    @Autowired
-    private SharedDriver sharedDriver;
-
     private static final String DEFAULT_EMAIL = "mail@com.pl";
     private static final String DEFAULT_PASSWORD = "password";
     private static final String LOGIN_URL = "http://localhost:8080/login";
     private static final String RESOURCE_URL = "http://localhost:8080/resource/1";
     private static final String HOME_URL_FRAGMENT = "/home";
-
     private static final String FROM = "15:00";
     private static final String TO = "20:00";
     private static final String FROM_PAST = "8:00";
     private static final String TO_PAST = "9:00";
-
+    @Autowired
+    @Qualifier("fixedClock")
+    private Clock fixedClock;
+    @Autowired
+    private SharedDriver sharedDriver;
     private String YESTERDAY_DATE;
     private String TODAY_DATE;
     private String TOMORROW_DATE;
@@ -55,13 +50,6 @@ public class ReservationTests {
         TODAY_DATE = LocalDate.now(fixedClock).toString();
         TOMORROW_DATE = LocalDate.now(fixedClock).plusDays(1).toString();
     }
-
-//    @After
-//    public void tearDown() {
-//        if (webDriver != null) {
-//            webDriver.quit();
-//        }
-//    }
 
     @Given("User is at resource's dedicated page")
     public void user_is_at_resources_dedicated_page() {

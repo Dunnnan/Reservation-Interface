@@ -1,7 +1,6 @@
 package com.dunnnan.reservations.e2e.tests;
 
 import com.dunnnan.reservations.e2e.config.SharedDriver;
-import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -25,27 +24,21 @@ import java.util.Objects;
 
 public class ResourceTests {
 
-    @Autowired
-    private SharedDriver sharedDriver;
-
     private static final String DEFAULT_EMAIL = "mail@com.pl";
     private static final String DEFAULT_PASSWORD = "password";
     private static final String EMPLOYEE_EMAIL = "ad@com.pl";
     private static final String EMPLOYEE_PASSWORD = "password";
     private static final String LOGIN_URL = "http://localhost:8080/login";
-
     private static final String HOME_URL = "http://localhost:8080/home";
-
     private static final String RESOURCE_URL_FRAGMENT = "/resource/";
     private static final String HOME_URL_FRAGMENT = "/home";
-
     private static final String SEARCH_PHRASE = "Larry";
-
     private static final String NEW_RESOURCE_NAME = "0_New Resource";
     private static final String NEW_RESOURCE_DESCRIPTION = "A description of the new resource.";
     private static final String NEW_RESOURCE_IMAGE = "";
     private static final String NEW_RESOURCE_TYPE = "A description of the new resource.";
-
+    @Autowired
+    private SharedDriver sharedDriver;
     private WebDriver webDriver;
     private WebDriverWait webDriverWait;
 
@@ -55,14 +48,6 @@ public class ResourceTests {
         webDriver = sharedDriver.getWebDriver();
         webDriverWait = sharedDriver.getWebDriverWait();
     }
-
-//    @After
-//    public void tearDown() {
-//        if (webDriver != null) {
-//            webDriver.quit();
-//        }
-//    }
-
 
     @Given("User is authenticated")
     public void user_is_authenticated() {
