@@ -3,7 +3,9 @@ package com.dunnnan.reservations.controller;
 
 import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
+import com.dunnnan.reservations.model.dto.ResourceDto;
 import com.dunnnan.reservations.repository.ResourceRepository;
+import com.dunnnan.reservations.service.ResourceService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,6 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.io.IOException;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
@@ -33,10 +37,25 @@ public class ResourcesTests {
     private MockMvc mockMvc;
 
     @BeforeAll
-    public static void init(@Autowired ResourceRepository resourceRepository) {
+    public static void init(@Autowired ResourceRepository resourceRepository, @Autowired ResourceService resourceService) throws IOException {
         resourceRepository.save(new Resource("Cat", "Very cute cat", "image1", ResourceType.CAT));
         resourceRepository.save(new Resource("Dog", "Very cute dog", "image2", ResourceType.DOG));
         resourceRepository.save(new Resource("Bear", "Very cute bear", "image3", ResourceType.BEAR));
+
+        MockMultipartFile imageFile = new MockMultipartFile(
+                "image",
+                "test-image.jpg",
+                "image/jpeg",
+                "image-content".getBytes()
+        );
+
+        ResourceDto resource = new ResourceDto();
+        resource.setName("name");
+        resource.setDescription("description");
+        resource.setImage(imageFile);
+        resource.setType("CAT");
+
+        resourceService.addResource(resource);
     }
 
     @Test
@@ -139,8 +158,78 @@ public class ResourcesTests {
                 .andExpect(view().name("redirect:/home"));
     }
 
+    /**
+     * For future :
+     * <br>
+     * 1. Move multi-creating MockMultipartFile from everywhere to the initiation and then use that version.<br>
+     * 2. Get new resource id after creation.<br>
+     * 3. Decide if creating 3 new resources in init is must-have.<br>
+     * @throws Exception
+     */
+
     @Test
-    public void shouldGetNotAuthorizedCode() throws Exception {
+    public void shouldGetNotAuthorizedCodeFromAdd() throws Exception {
+        MockMultipartFile imageFile = new MockMultipartFile(
+                "image",
+                "test-image.jpg",
+                "image/jpeg",
+                "image-content".getBytes()
+        );
+
+        mockMvc.perform(multipart("/resource")
+                        .file(imageFile)
+                        .param("name", "name")
+                        .param("description", "description")
+                        .param("type", "CAT")
+                        .with(user("mail@com.pl").roles("RESERVATOR"))
+                )
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void shouldEditResourceFormExistsIfUserIsAnEmployee() throws Exception {
+        mockMvc.perform(get("/resource/1")
+                        .with(user("ad@com.pl").roles("EMPLOYEE"))
+                )
+                .andExpect(status().isOk())
+                .andExpect(view().name("resource-detail"))
+                .andExpect(model().attributeExists("resource"))
+                .andExpect(content().string(containsString("id=\"editResourceModal\"")));
+    }
+
+    @Test
+    public void shouldEditResourceFormNotExistsIfUserIsAnReservant() throws Exception {
+        mockMvc.perform(get("/home")
+                        .with(user("mail@com.pl").roles("Reservant"))
+                )
+                .andExpect(status().isOk())
+                .andExpect(view().name("resource-detail"))
+                .andExpect(model().attributeExists("resource"))
+                .andExpect(content().string(not(containsString("id=\"editResourceModal\""))));
+    }
+
+    @Test
+    public void shouldSubmitTheEditResourceForm() throws Exception {
+        MockMultipartFile imageFile = new MockMultipartFile(
+                "image",
+                "test-image.jpg",
+                "image/jpeg",
+                "image-content".getBytes()
+        );
+
+        mockMvc.perform(multipart("/resource")
+                        .file(imageFile)
+                        .param("name", "name")
+                        .param("description", "description")
+                        .param("type", "CAT")
+                        .with(user("ad@com.pl").roles("EMPLOYEE"))
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/home"));
+    }
+
+    @Test
+    public void shouldGetNotAuthorizedCodeFromEdit() throws Exception {
         MockMultipartFile imageFile = new MockMultipartFile(
                 "image",
                 "test-image.jpg",
