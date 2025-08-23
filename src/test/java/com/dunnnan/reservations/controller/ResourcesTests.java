@@ -36,18 +36,18 @@ public class ResourcesTests {
     @Autowired
     private MockMvc mockMvc;
 
+    static final MockMultipartFile imageFile = new MockMultipartFile(
+            "image",
+            "test-image.jpg",
+            "image/jpeg",
+            "image-content".getBytes()
+    );
+
     @BeforeAll
     public static void init(@Autowired ResourceRepository resourceRepository, @Autowired ResourceService resourceService) throws IOException {
         resourceRepository.save(new Resource("Cat", "Very cute cat", "image1", ResourceType.CAT));
         resourceRepository.save(new Resource("Dog", "Very cute dog", "image2", ResourceType.DOG));
         resourceRepository.save(new Resource("Bear", "Very cute bear", "image3", ResourceType.BEAR));
-
-        MockMultipartFile imageFile = new MockMultipartFile(
-                "image",
-                "test-image.jpg",
-                "image/jpeg",
-                "image-content".getBytes()
-        );
 
         ResourceDto resource = new ResourceDto();
         resource.setName("name");
@@ -140,13 +140,6 @@ public class ResourcesTests {
 
     @Test
     public void shouldSubmitTheAddResourceForm() throws Exception {
-        MockMultipartFile imageFile = new MockMultipartFile(
-                "image",
-                "test-image.jpg",
-                "image/jpeg",
-                "image-content".getBytes()
-        );
-
         mockMvc.perform(multipart("/resource")
                         .file(imageFile)
                         .param("name", "name")
@@ -161,7 +154,6 @@ public class ResourcesTests {
     /**
      * For future :
      * <br>
-     * 1. Move multi-creating MockMultipartFile from everywhere to the initiation and then use that version.<br>
      * 2. Get new resource id after creation.<br>
      * 3. Decide if creating 3 new resources in init is must-have.<br>
      * @throws Exception
@@ -169,13 +161,6 @@ public class ResourcesTests {
 
     @Test
     public void shouldGetNotAuthorizedCodeFromAdd() throws Exception {
-        MockMultipartFile imageFile = new MockMultipartFile(
-                "image",
-                "test-image.jpg",
-                "image/jpeg",
-                "image-content".getBytes()
-        );
-
         mockMvc.perform(multipart("/resource")
                         .file(imageFile)
                         .param("name", "name")
@@ -210,13 +195,6 @@ public class ResourcesTests {
 
     @Test
     public void shouldSubmitTheEditResourceForm() throws Exception {
-        MockMultipartFile imageFile = new MockMultipartFile(
-                "image",
-                "test-image.jpg",
-                "image/jpeg",
-                "image-content".getBytes()
-        );
-
         mockMvc.perform(multipart("/resource")
                         .file(imageFile)
                         .param("name", "name")
@@ -230,13 +208,6 @@ public class ResourcesTests {
 
     @Test
     public void shouldGetNotAuthorizedCodeFromEdit() throws Exception {
-        MockMultipartFile imageFile = new MockMultipartFile(
-                "image",
-                "test-image.jpg",
-                "image/jpeg",
-                "image-content".getBytes()
-        );
-
         mockMvc.perform(multipart("/resource")
                         .file(imageFile)
                         .param("name", "name")
