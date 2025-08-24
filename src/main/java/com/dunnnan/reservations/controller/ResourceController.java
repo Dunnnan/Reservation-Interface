@@ -5,9 +5,9 @@ import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
 import com.dunnnan.reservations.model.dto.ReservationDto;
 import com.dunnnan.reservations.model.dto.ResourceDto;
-import com.dunnnan.reservations.service.FileStorageService;
 import com.dunnnan.reservations.service.ReservationService;
 import com.dunnnan.reservations.service.ResourceService;
+import com.dunnnan.reservations.validation.ResourceValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -30,10 +30,11 @@ public class ResourceController {
     private ReservationService reservationService;
 
     @Autowired
-    private PaginationConfig paginationConfig;
+    private ResourceValidator resourceValidator;
 
     @Autowired
-    private FileStorageService fileStorageService;
+    private PaginationConfig paginationConfig;
+
 
     @GetMapping("/home")
     public String home(
@@ -93,17 +94,8 @@ public class ResourceController {
             RedirectAttributes redirectAttributes
     ) throws IOException {
 
-        // Validate sent image (if it's an image)
-        if (!fileStorageService.isImage(resource.getImage())) {
-            result.rejectValue("image", "error.image", "File is not an image");
-        }
-
-        // Validate sent type (if it's listed in ResourceType enum)
-        if (Arrays.stream(ResourceType.values())
-                .noneMatch(type -> type.name().equalsIgnoreCase(resource.getType()))
-        ) {
-            result.rejectValue("type", "error.type", "Type doesn't exist in system");
-        }
+        // Validate new resource data
+        resourceValidator.validateAddResourceDto(resource, result);
 
         if (result.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.resource", result);

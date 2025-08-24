@@ -184,7 +184,7 @@ public class ResourcesTests {
 
     @Test
     public void shouldEditResourceFormNotExistsIfUserIsAnReservant() throws Exception {
-        mockMvc.perform(get("/home")
+        mockMvc.perform(get("/resource/1")
                         .with(user("mail@com.pl").roles("Reservant"))
                 )
                 .andExpect(status().isOk())
