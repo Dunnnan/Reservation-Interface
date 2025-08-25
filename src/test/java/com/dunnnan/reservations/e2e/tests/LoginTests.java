@@ -1,8 +1,5 @@
 package com.dunnnan.reservations.e2e.tests;
 
-import com.dunnnan.reservations.e2e.config.SharedDriver;
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -18,9 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 public class LoginTests {
 
-    @Autowired
-    private SharedDriver sharedDriver;
-
     private static final String LOGIN_URL = "http://localhost:8080/login";
     private static final String REGISTER_URL = "http://localhost:8080/register";
     private static final String HOME_URL = "http://localhost:8080/home";
@@ -29,21 +23,12 @@ public class LoginTests {
     private static final String DEFAULT_PASSWORD = "password";
     private static final String WRONG_PASSWORD = "wrongPassword";
 
+    @Autowired
     private WebDriver webDriver;
+
+    @Autowired
     private WebDriverWait webDriverWait;
 
-    @Before
-    public void setUp() {
-        webDriver = sharedDriver.getWebDriver();
-        webDriverWait = sharedDriver.getWebDriverWait();
-    }
-
-    @After
-    public void tearDown() {
-        if (webDriver != null) {
-            webDriver.quit();
-        }
-    }
 
     @Given("user is on logging page")
     public void user_is_on_logging_page() {

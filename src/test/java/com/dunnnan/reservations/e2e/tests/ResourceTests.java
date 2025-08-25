@@ -1,7 +1,5 @@
 package com.dunnnan.reservations.e2e.tests;
 
-import com.dunnnan.reservations.e2e.config.SharedDriver;
-import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -37,17 +35,13 @@ public class ResourceTests {
     private static final String NEW_RESOURCE_DESCRIPTION = "A description of the new resource.";
     private static final String NEW_RESOURCE_IMAGE = "";
     private static final String NEW_RESOURCE_TYPE = "A description of the new resource.";
+
     @Autowired
-    private SharedDriver sharedDriver;
     private WebDriver webDriver;
+
+    @Autowired
     private WebDriverWait webDriverWait;
 
-
-    @Before
-    public void setUp() {
-        webDriver = sharedDriver.getWebDriver();
-        webDriverWait = sharedDriver.getWebDriverWait();
-    }
 
     @Given("User is authenticated")
     public void user_is_authenticated() {

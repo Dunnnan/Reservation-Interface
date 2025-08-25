@@ -1,6 +1,5 @@
 package com.dunnnan.reservations.e2e.tests;
 
-import com.dunnnan.reservations.e2e.config.SharedDriver;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -28,24 +27,24 @@ public class ReservationTests {
     private static final String TO = "20:00";
     private static final String FROM_PAST = "8:00";
     private static final String TO_PAST = "9:00";
+
     @Autowired
     @Qualifier("fixedClock")
     private Clock fixedClock;
-    @Autowired
-    private SharedDriver sharedDriver;
+
     private String YESTERDAY_DATE;
     private String TODAY_DATE;
     private String TOMORROW_DATE;
 
+    @Autowired
     private WebDriver webDriver;
+
+    @Autowired
     private WebDriverWait webDriverWait;
 
 
     @Before
     public void setUp() {
-        webDriver = sharedDriver.getWebDriver();
-        webDriverWait = sharedDriver.getWebDriverWait();
-
         YESTERDAY_DATE = LocalDate.now(fixedClock).minusDays(1).toString();
         TODAY_DATE = LocalDate.now(fixedClock).toString();
         TOMORROW_DATE = LocalDate.now(fixedClock).plusDays(1).toString();

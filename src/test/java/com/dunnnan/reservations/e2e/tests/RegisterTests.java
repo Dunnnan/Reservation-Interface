@@ -1,8 +1,5 @@
 package com.dunnnan.reservations.e2e.tests;
 
-import com.dunnnan.reservations.e2e.config.SharedDriver;
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -19,9 +16,6 @@ import static org.junit.Assert.assertTrue;
 
 public class RegisterTests {
 
-    @Autowired
-    private SharedDriver sharedDriver;
-
     private static final String DEFAULT_NAME = "name";
     private static final String DEFAULT_SURNAME = "surname";
     private static final String DEFAULT_EMAIL = "new_mail@com.pl";
@@ -32,21 +26,12 @@ public class RegisterTests {
     private static final String REGISTER_URL = "http://localhost:8080/register";
     private static final String LOGIN_URL_FRAGMENT = "/login";
 
+    @Autowired
     private WebDriver webDriver;
+
+    @Autowired
     private WebDriverWait webDriverWait;
 
-    @Before
-    public void setUp() {
-        webDriver = sharedDriver.getWebDriver();
-        webDriverWait = sharedDriver.getWebDriverWait();
-    }
-
-    @After
-    public void tearDown() {
-        if (webDriver != null) {
-            webDriver.quit();
-        }
-    }
 
     @Given("user is on register page")
     public void user_is_on_register_page() {
