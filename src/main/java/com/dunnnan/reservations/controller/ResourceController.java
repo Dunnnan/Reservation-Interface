@@ -119,6 +119,7 @@ public class ResourceController {
         Optional<Resource> resource = resourceService.getResourceById(id);
         if (resource.isPresent()) {
             model.addAttribute("resource", resource.get());
+            model.addAttribute("resourceDto", new ResourceDto());
             model.addAttribute("reservation", new ReservationDto());
 
             reservationService.addCalendarDataToModel(id, weeksLater, model);
