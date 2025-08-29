@@ -65,6 +65,18 @@ public class ResourceService {
         return resourceRepository.findByTypeInAndNameContainingIgnoreCase(page, types, search);
     }
 
+//    public ResourceDto getResoureDto(Long id) {
+//        Optional<Resource> resourceOptional = getResourceById(id);
+//        Resource resource = resourceOptional.orElse(new Resource());
+//
+//        return new ResourceDto(
+//                resource.getName(),
+//                resource.getDescription(),
+//                resource.getImageName(),
+//                resource.getType()
+//        );
+//    }
+
 //    public List<String> getSortOptions() {
 //        return reservationConstants.getSortOptions();
 //    }

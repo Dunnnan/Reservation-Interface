@@ -21,6 +21,13 @@ public class ResourceDto {
     public ResourceDto() {
     }
 
+    public ResourceDto(String name, String description, MultipartFile image, String type) {
+        this.name = name;
+        this.description = description;
+        this.image = image;
+        this.type = type;
+    }
+
     public @NotBlank(message = "Name of a resource is required") String getName() {
         return name;
     }
