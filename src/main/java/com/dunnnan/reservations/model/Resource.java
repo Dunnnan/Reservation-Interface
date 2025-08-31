@@ -22,6 +22,10 @@ public class Resource {
     @Column(nullable = false, updatable = true)
     private ResourceType type;
 
+//    @ManyToOne
+//    @JoinColumn(name = "resource_type_id", updatable = true, nullable = false)
+//    private ResourceType type;
+
     public Resource() {
     }
 
