@@ -252,6 +252,19 @@
                             X
                         </label>
 
+                        <!--                        <div th:each="option : ${sortOptions}">-->
+                        <!--                            <input type="radio"-->
+                        <!--                                   class="btn-check"-->
+                        <!--                                   name="sortOption"-->
+                        <!--                                   th:value="${option}"-->
+                        <!--                                   th:id="${'type_' + option}"-->
+                        <!--                                   th:checked="${sortField == option}"-->
+                        <!--                                   onchange="this.form.submit()">-->
+
+                        <!--                            <label class="btn btn-outline-primary" th:for="${'type_' + option}"-->
+                        <!--                                   th:text="${option}"></label>-->
+                        <!--                        </div>-->
+
                         <input type="radio" class="btn-check" name="sortField" id="sortName" value="name"
                                th:checked="${sortField == 'name'}" onchange="this.form.submit()">
                         <label class="btn btn-outline-primary" for="sortName">Name</label>

@@ -2,6 +2,7 @@ package com.dunnnan.reservations.service;
 
 import com.dunnnan.reservations.config.PaginationConfig;
 import com.dunnnan.reservations.constants.ReservationConstants;
+import com.dunnnan.reservations.constants.ResourceConstants;
 import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
 import com.dunnnan.reservations.model.dto.ResourceDto;
@@ -34,6 +35,9 @@ public class ResourceService {
 
     @Autowired
     private ReservationConstants reservationConstants;
+
+    @Autowired
+    private ResourceConstants resourceConstants;
 
     @Autowired
     private AvailabilityService availabilityService;
@@ -77,9 +81,9 @@ public class ResourceService {
 //        );
 //    }
 
-//    public List<String> getSortOptions() {
-//        return reservationConstants.getSortOptions();
-//    }
+    public List<String> getSortOptions() {
+        return resourceConstants.getSortOptions();
+    }
 
     public Sort getSort(String sortDirection, String sortField) {
         sortField = resourceValidator.validateSortField(sortField);

@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ResourceTypeRepository extends JpaRepository<ResourceType, String> {
-    Optional<ResourceType> findById(Long id);
-
-}
+//public interface ResourceTypeRepository extends JpaRepository<ResourceType, String> {
+//    Optional<ResourceType> findById(Long id);
+//
+//}
