@@ -1,5 +1,6 @@
 package com.dunnnan.reservations.validation;
 
+import com.dunnnan.reservations.constants.ResourceConstants;
 import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
 import com.dunnnan.reservations.model.dto.ResourceDto;
@@ -22,6 +23,8 @@ public class ResourceValidator {
     FileStorageService fileStorageService;
     @Autowired
     private ClassUtil classUtil;
+    @Autowired
+    private ResourceConstants resourceConstants;
 
     public boolean isCorrectSortDirection(String sortDirection) {
         return sortDirection.equalsIgnoreCase("asc") || sortDirection.equalsIgnoreCase("desc");
@@ -31,8 +34,28 @@ public class ResourceValidator {
         return (sortDirection == null || sortDirection.isEmpty() || !isCorrectSortDirection(sortDirection)) ? "asc" : sortDirection;
     }
 
+    public boolean isUniqueSortFormula(String sortField) {
+        return (resourceConstants.getSortOptions()
+                .stream()
+                .anyMatch(option -> option.equalsIgnoreCase(sortField))
+        );
+    }
+
+    public String validateUniqueSortFormula(String sortField) {
+        switch (sortField.toLowerCase()) {
+            case "added":
+                return "id";
+
+            default:
+                return "id";
+        }
+    }
+
     public String validateSortField(String sortField) {
         Set<String> validSortFields = classUtil.getValidFields(Resource.class);
+        if (isUniqueSortFormula(sortField)) {
+            return validateUniqueSortFormula(sortField);
+        }
         return (sortField == null || sortField.isEmpty() || !validSortFields.contains(sortField)) ? "id" : sortField;
     }
 

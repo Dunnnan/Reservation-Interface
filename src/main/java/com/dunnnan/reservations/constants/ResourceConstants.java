@@ -18,10 +18,13 @@ public class ResourceConstants {
      * Available sort options for resources.
      * <br>
      * Option must be a field in @Resource class.
+     * <br>
+     * Each unique sort option should have its own formula in @ResourceValidator
      */
     private List<String> sortOptions = List.of(
-            "name",
-            "description"
+            "Name",
+            "Type",
+            "Added"
     );
 
     public List<String> getSortOptions() {
