@@ -3,9 +3,10 @@ package com.dunnnan.reservations.controller;
 import com.dunnnan.reservations.TestConfig;
 import com.dunnnan.reservations.model.Resource;
 import com.dunnnan.reservations.model.ResourceType;
-import com.dunnnan.reservations.repository.ResourceRepository;
+import com.dunnnan.reservations.model.dto.ResourceDto;
 import com.dunnnan.reservations.service.AvailabilityService;
 import com.dunnnan.reservations.service.ReservationService;
+import com.dunnnan.reservations.service.ResourceService;
 import com.dunnnan.reservations.service.UserService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,13 +40,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ReservationTests {
 
     private static UserDetails userDetails;
+    private Long resourceId;
+
     @Autowired
     WebApplicationContext webApplicationContext;
     @Autowired
     MockMvc mockMvc;
-    private Long resourceId;
+
     @Autowired
-    private ResourceRepository resourceRepository;
+    private ResourceService resourceService;
 
     @Autowired
     private UserService userService;
@@ -66,11 +69,14 @@ public class ReservationTests {
     @BeforeAll
     public void init() {
         userDetails = userService.loadUserByUsername("mail@com.pl");
-
-        Resource resource = resourceRepository.save(new Resource("Cat", "Very cute cat", "image1", ResourceType.CAT));
-        resourceId = resource.getId();
-
-        availabilityService.createDefaultAvailabilities(resource);
+        resourceId = resourceService.addResourceMock(
+                new Resource(
+                        "Cat",
+                        "Very cute cat",
+                        "image1",
+                        ResourceType.CAT
+                )
+        ).getId();
     }
 
     @Test

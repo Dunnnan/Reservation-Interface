@@ -30,12 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class ResourcesTests {
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private MockMvc mockMvc;
-
     static final MockMultipartFile imageFile = new MockMultipartFile(
             "image",
             "test-image.jpg",
@@ -43,19 +37,25 @@ public class ResourcesTests {
             "image-content".getBytes()
     );
 
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+    @Autowired
+    private MockMvc mockMvc;
+
     @BeforeAll
     public static void init(@Autowired ResourceRepository resourceRepository, @Autowired ResourceService resourceService) throws IOException {
         resourceRepository.save(new Resource("Cat", "Very cute cat", "image1", ResourceType.CAT));
         resourceRepository.save(new Resource("Dog", "Very cute dog", "image2", ResourceType.DOG));
         resourceRepository.save(new Resource("Bear", "Very cute bear", "image3", ResourceType.BEAR));
 
-        ResourceDto resource = new ResourceDto();
-        resource.setName("name");
-        resource.setDescription("description");
-        resource.setImage(imageFile);
-        resource.setType("CAT");
-
-        resourceService.addResource(resource);
+        resourceService.addResource(
+                new ResourceDto(
+                        "name",
+                        "description",
+                        imageFile,
+                        "CAT"
+                )
+        );
     }
 
     @Test
@@ -156,6 +156,7 @@ public class ResourcesTests {
      * <br>
      * 2. Get new resource id after creation.<br>
      * 3. Decide if creating 3 new resources in init is must-have.<br>
+     *
      * @throws Exception
      */
 

@@ -184,6 +184,12 @@ public class ResourceService {
         availabilityService.createDefaultAvailabilities(resource);
     }
 
+    public Resource addResourceMock(Resource resource) {
+        resourceRepository.save(resource);
+        availabilityService.createDefaultAvailabilities(resource);
+        return resource;
+    }
+
     // Find resource by id
     public Resource findResourceById(Long id) {
         return resourceRepository.findById(id).orElseThrow(
