@@ -17,9 +17,9 @@ public class ResourceConstants {
     /**
      * Available sort options for resources.
      * <br>
-     * Option must be a field in @Resource class.
+     * Option must be a field in {@code @Resource} class.
      * <br>
-     * Each unique sort option should have its own formula in @ResourceValidator
+     * Each unique sort option should have its own formula in {@code @ResourceValidator}
      */
     private List<String> sortOptions = List.of(
             "Name",
